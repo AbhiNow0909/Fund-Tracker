@@ -29,6 +29,14 @@ OpenAPI docs: http://localhost:8000/docs
 
 Routers and services are added per the step plan in `../CLAUDE.md` Section 15.
 
+## Tests
+
+```bash
+cd backend
+.venv\Scripts\activate
+pytest -q          # analytics_engine unit tests (XIRR, returns, risk, gains)
+```
+
 ## Verifying the MF parser (Step 3 — mandatory)
 
 `casparser`'s NSDL support is alpha, so its output must be verified against real
