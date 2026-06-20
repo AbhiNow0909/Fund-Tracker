@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     current_fy: str = "2025-26"
     ltcg_exemption_threshold: float = 125000.0
 
+    # Daily NAV/LTP sync scheduler — off by default so dev boots don't fire
+    # network jobs. Enable in production (or to test the job locally).
+    enable_scheduler: bool = False
+    sync_hour: int = 21  # local hour to run the daily sync (after market/NAV close)
+
 
 @lru_cache
 def get_settings() -> Settings:

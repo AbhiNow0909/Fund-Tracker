@@ -23,8 +23,9 @@ numpy==2.2.1
 scipy==1.15.0
 
 # Data fetching
+# Yahoo Finance is queried directly via httpx (yfinance dropped — its current
+# releases fail to parse Yahoo responses; the raw chart endpoint is reliable).
 httpx==0.28.1
-yfinance==0.2.51
 
 # Scheduling
 APScheduler==3.11.0

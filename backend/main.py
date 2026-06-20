@@ -3,18 +3,33 @@
 Conventional FastAPI app: routers call services, services call the database.
 No AI layer. Routers are wired in as each implementation step lands.
 """
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
 from routers import portfolio
+from scheduler.daily_sync import start_scheduler
 
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = start_scheduler()  # no-op unless ENABLE_SCHEDULER=true
+    try:
+        yield
+    finally:
+        if scheduler is not None:
+            scheduler.shutdown(wait=False)
+
 
 app = FastAPI(
     title="Equity Investment Tracker API",
     version="0.1.0",
     description="Backend for parsing NSDL eCAS statements and computing fund + equity analytics.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

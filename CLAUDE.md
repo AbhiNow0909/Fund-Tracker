@@ -463,8 +463,8 @@ NSE's published equity master list.
 | Mutual fund NAV (current + historical) | MFApi.in | Free REST API, AMFI scheme codes |
 | Mutual fund NAV (fallback) | AMFI website | Direct NAV text file if MFApi is down |
 | Mutual fund expense ratio | AMFI scheme metadata | Published per scheme |
-| Stock LTP (current + historical) | `yfinance`, ticker + `.NS` suffix | Fallback to `.BO` for BSE-only listings |
-| Benchmark (Nifty 50 TRI, Nifty 500 TRI) | `yfinance` | Used for Alpha/Beta across both asset types |
+| Stock LTP (current + historical) | Yahoo Finance chart API via `httpx`, ticker + `.NS` | Fallback to `.BO`. (Revised at Step 5: `yfinance` dropped — current releases fail to parse Yahoo; the raw chart endpoint is reliable. Same data source.) |
+| Benchmark (Nifty 50 TRI, Nifty 500 TRI) | Yahoo Finance via `httpx` (`^NSEI`, `^CRSLDX`) | Price-index proxy for TRI — free TRI series unavailable; swap in a real TRI source if exact alpha/beta vs TRI is needed |
 
 ### 7.4 Unified analytics inputs
 
