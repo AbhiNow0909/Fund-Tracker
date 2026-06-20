@@ -97,10 +97,11 @@ def _normalize_txn_type(raw: Any) -> str:
     return _TXN_TYPE_MAP.get(key, "misc")
 
 
-def parse_mf_cas(file_path: str, password: str) -> ParsedMFData:
-    """Parse the mutual-fund portion of a CAS PDF into our normalized schema.
+def read_cas_payload(file_path: str, password: str) -> dict[str, Any]:
+    """Parse a CAS PDF with casparser once and return its data as a plain dict.
 
-    Raises MFParseError on any failure (wrong password, unsupported file, etc.).
+    Shared by the MF normalizer and the equity extractor so the upload route
+    parses the PDF a single time. Raises MFParseError on any failure.
     """
     try:
         import casparser
@@ -117,8 +118,20 @@ def parse_mf_cas(file_path: str, password: str) -> ParsedMFData:
             message = "Incorrect PDF password (for an eCAS this is usually your PAN)."
         raise MFParseError(f"Could not parse statement: {message}") from exc
 
-    payload = data.model_dump(by_alias=True) if hasattr(data, "model_dump") else data
+    return data.model_dump(by_alias=True) if hasattr(data, "model_dump") else data
+
+
+def normalize_mf(payload: dict[str, Any]) -> ParsedMFData:
+    """Normalize an already-read casparser payload into ParsedMFData."""
     return _normalize(payload)
+
+
+def parse_mf_cas(file_path: str, password: str) -> ParsedMFData:
+    """Parse the mutual-fund portion of a CAS PDF into our normalized schema.
+
+    Raises MFParseError on any failure (wrong password, unsupported file, etc.).
+    """
+    return _normalize(read_cas_payload(file_path, password))
 
 
 def _normalize(payload: dict[str, Any]) -> ParsedMFData:

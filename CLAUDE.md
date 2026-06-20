@@ -399,7 +399,20 @@ analytics engine are built on top of it. Log this verification as part of Step 3
 `folios[].schemes[]`, nothing else. It will silently ignore the equity section of an NSDL CAS
 entirely. This is expected, not a bug -- that's what the custom extractor in 7.2 is for.
 
-### 7.2 Equities / demat holdings -- custom `pdfplumber` extractor
+### 7.2 Equities / demat holdings -- via `casparser` 1.2.0 (revised)
+
+> **Implementation update (Step 3/4):** The premise below — that no free library
+> parses NSDL equities — was true for casparser's ~0.7 alpha but is now **outdated**.
+> casparser **1.2.0** parses the full NSDL/CDSL demat section into
+> `NSDLCASData.accounts[].equities[]` (name, isin, num_shares, price, value, symbol,
+> exchange) and auto-enriches symbol/exchange. Per the user's decision, the equity
+> extractor (`services/equity_extractor.py`) reads casparser's output instead of a
+> custom `pdfplumber` extractor — it's free, **local** (privacy promise preserved),
+> maintained, and avoids a second parsing pass. The `pdfplumber` approach below is
+> retained only as a fallback option if a future statement defeats casparser.
+> ISIN→sector enrichment uses a local static map (`services/isin_sectors.py`).
+> Note: an eCAS is a snapshot, so equities have no cost basis (avg price/invested
+> are filled later via broker import or manual entry).
 
 No free, maintained, open source library extracts the equities section of an NSDL/CDSL CAS.
 (The only tool that does this -- `casparser.in` / `cas-parser-python` -- is a paid, cloud-hosted
@@ -1072,10 +1085,12 @@ Keep `.env.example` files for both, committed, with placeholder values only.
 **Decisions made and locked:**
 - This is a standalone project, separate from any other portfolio tracker
 - Tech stack: FastAPI + Next.js + Supabase, no AI/LLM/LangGraph
-- Dual-parser strategy: `casparser` for MF, custom `pdfplumber` extractor for equities --
-  commercial `casparser.in` API explicitly rejected for cost and privacy reasons
-- NSDL support in `casparser` is alpha-quality and must be verified against real statements
-  before downstream work proceeds (Step 3)
+- Parsing strategy (revised at Step 3/4): `casparser` **1.2.0** parses BOTH MF and
+  demat equities from NSDL/CDSL eCAS locally. The originally-planned custom `pdfplumber`
+  equity extractor was dropped in favour of casparser's `accounts[].equities[]` (see §7.2);
+  `pdfplumber` kept only as a potential fallback. Commercial `casparser.in` API still rejected.
+- casparser output still must be verified against real statements (Step 3 verify scripts:
+  `backend/scripts/verify_mf_parser.py`, `verify_equity_parser.py`)
 - 10-screen scope locked to the wireframe, including the new Stocks/Shares screen
 - Light, Windows-11-inspired design system, tokens to be extracted directly from the wireframe
 
@@ -1085,7 +1100,9 @@ readable in `wireframe/extracted.html` before writing any application code.
 
 **Not yet decided (decide when you reach that step):**
 - Exact NSDL alpha-quality issues, if any -- discover and document during Step 3
-- ISIN-to-sector mapping source for equities -- decide during Step 4
+  (resolved: casparser 1.2.0 parses NSDL MF + equities; verify against real statements)
+- ISIN-to-sector mapping source for equities -- decided during Step 4: local static map
+  in `backend/services/isin_sectors.py`, expandable to NSE master list later
 - Production hosting choice for the backend (Railway vs Render) -- decide during Step 18
 
 ---

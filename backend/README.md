@@ -49,6 +49,13 @@ wrong, follow `../CLAUDE.md` Section 14: sanitize a sample (fake every name/ISIN
 PAN/amount, keep the exact layout) and share ONLY the sanitized text so the
 parser can be fixed.
 
-The `POST /portfolio/upload` route (MF half) is wired in `routers/portfolio.py`:
-it parses to a temp file, upserts `mf_holdings` + `transactions`, then deletes the
-PDF — it is never persisted.
+Also verify the **equity** extraction (Step 4) the same way:
+
+```bash
+python scripts/verify_equity_parser.py path\to\your-cas.pdf
+```
+
+The `POST /portfolio/upload` route parses the PDF once (casparser) and persists
+`mf_holdings` + `transactions` **and** `equity_holdings`, then deletes the PDF — it
+is never persisted. Demat equities come from casparser's `accounts[].equities[]`
+(see CLAUDE.md §7.2); sector is enriched from `services/isin_sectors.py`.
