@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
+from routers import portfolio
 
 settings = get_settings()
 
@@ -31,7 +32,9 @@ def health() -> dict[str, str]:
     return {"status": "ok", "environment": settings.environment}
 
 
+app.include_router(portfolio.router)
+
 # Routers added in later steps:
-#   from routers import portfolio, equity, analytics, explore, tax, transactions
-#   app.include_router(portfolio.router)
+#   from routers import equity, analytics, explore, tax, transactions
+#   app.include_router(equity.router)
 #   ...

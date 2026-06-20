@@ -12,7 +12,9 @@ python-jose[cryptography]==3.3.0
 supabase==2.11.0
 
 # CAS parsing
-casparser==0.7.5
+# casparser 1.2.0 parses BOTH CAMS/KFin (folios) and NSDL/CDSL (demat accounts incl.
+# equities) — far more mature than the alpha NSDL support CLAUDE.md was written against.
+casparser==1.2.0
 pdfplumber==0.11.5
 
 # Financial math
