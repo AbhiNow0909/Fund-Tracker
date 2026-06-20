@@ -1,0 +1,38 @@
+# ===== Python / backend =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Node / frontend =====
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# ===== Env / secrets =====
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# ===== CAS PDFs (never commit personal statements) =====
+*.pdf
+!wireframe/**/*.pdf
+
+# ===== OS / editor =====
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

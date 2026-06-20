@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f9f9f9;
+  color: #1a1a1a;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every price, percentage and quantity uses tabular figures (CLAUDE.md §5). */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Windows-style scrollbar used on the content pane. */
+.win-scroll::-webkit-scrollbar {
+  width: 14px;
+}
+.win-scroll::-webkit-scrollbar-thumb {
+  background: #c7c7c7;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
+}
+.win-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}

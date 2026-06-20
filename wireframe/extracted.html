@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="37511eb6-8d25-4a3f-8321-90a51a324d72"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#0e2a44}
+.cap:hover{background:rgba(0,0,0,0.06)}
+.capclose:hover{background:#c42b1c;color:#fff}
+.nav{position:relative}
+.nav:hover{background:rgba(0,0,0,0.04)}
+.nav[data-active="true"]{background:rgba(0,0,0,0.06)}
+.nav[data-active="true"]:hover{background:rgba(0,0,0,0.075)}
+.nav[data-active="true"]::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:3px;background:#005FB8}
+.row11:hover{background:rgba(0,0,0,0.025)}
+.acc:hover{background:#1a6fc4}
+.std:hover{background:#f4f4f4}
+.win-scroll::-webkit-scrollbar{width:14px}
+.win-scroll::-webkit-scrollbar-thumb{background:#c7c7c7;border:4px solid transparent;background-clip:padding-box;border-radius:8px}
+.win-scroll::-webkit-scrollbar-thumb:hover{background:#a0a0a0;border:4px solid transparent;background-clip:padding-box}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:22px;font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,sans-serif;background:radial-gradient(900px 700px at 22% 18%,#2f6d8f 0%,transparent 60%),radial-gradient(800px 800px at 82% 88%,#1d5a76 0%,transparent 55%),linear-gradient(135deg,#0c233b,#16456a)">
+
+  <!-- ===== WINDOW ===== -->
+  <div style="width:min(1340px,97vw);height:min(884px,94vh);background:#f3f3f3;border-radius:8px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.07);display:flex;flex-direction:column">
+
+    <!-- ===== TITLE BAR (custom, integrated) ===== -->
+    <div style="height:48px;flex:0 0 auto;display:flex;align-items:center;background:#eaeaea;border-bottom:1px solid rgba(0,0,0,0.06);padding-left:12px">
+      <div style="display:flex;align-items:center;gap:10px;min-width:230px">
+        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="9" width="3.4" height="9" rx="1" fill="#005FB8"></rect><rect x="7" y="5" width="3.4" height="13" rx="1" fill="#0F7B0F"></rect><rect x="12" y="2.5" width="3.4" height="15.5" rx="1" fill="#005FB8"></rect></svg>
+        </div>
+        <span style="font-size:13px;color:#1a1a1a;font-weight:600;letter-spacing:.01em">Equity Investment Tracker</span>
+      </div>
+      <!-- integrated search -->
+      <div style="flex:1;display:flex;justify-content:center;padding:0 18px">
+        <div style="width:100%;max-width:480px;height:30px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.75);border:1px solid rgba(0,0,0,0.1);border-radius:5px;padding:0 11px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#5e5e5e" stroke-width="1.4"><circle cx="7" cy="7" r="4.3"></circle><line x1="10.4" y1="10.4" x2="14" y2="14" stroke-linecap="round"></line></svg>
+          <span style="font-size:12.5px;color:#8a8a8a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Search funds, stocks, AMCs, sectors</span>
+        </div>
+      </div>
+      <!-- caption buttons -->
+      <div style="display:flex;align-items:stretch;height:48px;min-width:230px;justify-content:flex-end">
+        <div class="cap" style="width:46px;display:flex;align-items:center;justify-content:center;cursor:default;color:#1a1a1a"><svg width="10" height="10"><line x1="0" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1"></line></svg></div>
+        <div class="cap" style="width:46px;display:flex;align-items:center;justify-content:center;cursor:default;color:#1a1a1a"><svg width="10" height="10"><rect x="0.5" y="0.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"></rect></svg></div>
+        <div class="capclose" style="width:46px;display:flex;align-items:center;justify-content:center;cursor:default;color:#1a1a1a"><svg width="10" height="10"><line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1"></line><line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1"></line></svg></div>
+      </div>
+    </div>
+
+    <!-- ===== BODY ===== -->
+    <div style="flex:1;display:flex;min-height:0">
+
+      <!-- ===== NAVIGATION PANE ===== -->
+      <div style="width:280px;flex:0 0 auto;background:#eaeaea;display:flex;flex-direction:column;padding:6px 8px 10px">
+        <div class="nav" style="display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:5px;cursor:default;margin-bottom:2px">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"></line><line x1="2" y1="8" x2="14" y2="8"></line><line x1="2" y1="12" x2="14" y2="12"></line></svg>
+        </div>
+        <!-- portfolio switcher -->
+        <div style="position:relative;margin-bottom:8px">
+          <div class="nav" onclick="{{ onTogglePort }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;cursor:default">
+            <span style="width:26px;height:26px;border-radius:5px;background:#005FB8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">EI</span>
+            <div style="line-height:1.25;flex:1"><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">{{ portName }}</div><div style="font-size:11px;color:#707070">{{ portDesc }}</div></div>
+            <span style="color:#707070;font-size:10px">⌄</span>
+          </div>
+          <sc-if value="{{ portOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:4px;right:4px;top:46px;z-index:90;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:7px;box-shadow:0 8px 22px rgba(0,0,0,0.18);padding:4px">
+              <div class="nav" onclick="{{ onPickSample }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:5px;cursor:default;background:{{ sampleActiveBg }}">
+                <div style="line-height:1.2"><div style="font-size:13px;font-weight:600;color:#1a1a1a">Sample portfolio</div><div style="font-size:11px;color:#707070">demo data</div></div>
+                <span style="font-size:10px;color:#005FB8;border:1px solid rgba(0,103,184,0.4);border-radius:9px;padding:1px 7px">demo</span>
+              </div>
+              <div class="nav" onclick="{{ onPickMine }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:5px;cursor:default;background:{{ mineActiveBg }}">
+                <div style="line-height:1.2"><div style="font-size:13px;font-weight:600;color:#1a1a1a">My portfolio</div><div style="font-size:11px;color:#707070">connect to populate</div></div>
+                <span style="font-size:10px;color:#707070">empty</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="font-size:11px;color:#707070;padding:4px 12px 4px;font-weight:600">Portfolio</div>
+        <!-- selected: Dashboard -->
+        <div class="nav" data-active="{{ act.dashboard }}" onclick="{{ go_dashboard }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"></rect><rect x="9" y="2" width="5" height="5" rx="1"></rect><rect x="2" y="9" width="5" height="5" rx="1"></rect><rect x="9" y="9" width="5" height="5" rx="1"></rect></svg>
+          <span style="font-size:14px;color:#1a1a1a">Dashboard</span>
+        </div>
+        <div class="nav" data-active="{{ act.explore }}" onclick="{{ go_explore }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4"><circle cx="7" cy="7" r="4.3"></circle><line x1="10.4" y1="10.4" x2="14" y2="14" stroke-linecap="round"></line></svg>
+          <span style="font-size:14px;color:#1a1a1a">Explore / Watchlist</span>
+        </div>
+        <div class="nav" data-active="{{ act.fund }}" onclick="{{ go_fund }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4"><rect x="3.5" y="2" width="9" height="12" rx="1"></rect><line x1="5.6" y1="5.2" x2="10.4" y2="5.2" stroke-linecap="round"></line><line x1="5.6" y1="8" x2="10.4" y2="8" stroke-linecap="round"></line><line x1="5.6" y1="10.8" x2="8.6" y2="10.8" stroke-linecap="round"></line></svg>
+          <span style="font-size:14px;color:#1a1a1a">Fund Detail</span>
+        </div>
+        <div class="nav" data-active="{{ act.stocks }}" onclick="{{ go_stocks }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="2.3" y1="13.5" x2="13.7" y2="13.5"></line><rect x="3" y="8" width="2.6" height="4" rx="0.6"></rect><rect x="6.7" y="5" width="2.6" height="7" rx="0.6"></rect><rect x="10.4" y="2.6" width="2.6" height="9.4" rx="0.6"></rect></svg>
+          <span style="font-size:14px;color:#1a1a1a">Stocks / Shares</span>
+        </div>
+        <div class="nav" data-active="{{ act.compare }}" onclick="{{ go_compare }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.6" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="7"></line><line x1="8" y1="13" x2="8" y2="3"></line><line x1="12" y1="13" x2="12" y2="9"></line></svg>
+          <span style="font-size:14px;color:#1a1a1a">Compare</span>
+        </div>
+        <div class="nav" data-active="{{ act.returns }}" onclick="{{ go_returns }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,11 6,7 9,9.5 14,3.5"></polyline><polyline points="10.5,3.5 14,3.5 14,7"></polyline></svg>
+          <span style="font-size:14px;color:#1a1a1a">Returns Analyzer</span>
+        </div>
+        <div class="nav" data-active="{{ act.risk }}" onclick="{{ go_risk }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4" stroke-linejoin="round"><path d="M8 2 L13 4 V8 C13 11 10.6 13.4 8 14.4 C5.4 13.4 3 11 3 8 V4 Z"></path></svg>
+          <span style="font-size:14px;color:#1a1a1a">Risk Metrics</span>
+        </div>
+        <div class="nav" data-active="{{ act.tax }}" onclick="{{ go_tax }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4" stroke-linecap="round"><line x1="4" y1="12" x2="12" y2="4"></line><circle cx="5.5" cy="5.5" r="1.4"></circle><circle cx="10.5" cy="10.5" r="1.4"></circle></svg>
+          <span style="font-size:14px;color:#1a1a1a">Tax / Capital Gains</span>
+        </div>
+        <div class="nav" data-active="{{ act.txns }}" onclick="{{ go_txns }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="12.5" y2="6"></line><polyline points="10.5,4 12.5,6 10.5,8"></polyline><line x1="13" y1="10" x2="3.5" y2="10"></line><polyline points="5.5,8 3.5,10 5.5,12"></polyline></svg>
+          <span style="font-size:14px;color:#1a1a1a">Transactions</span>
+        </div>
+        <div class="nav" data-active="{{ act.import }}" onclick="{{ go_import }}" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default;margin-bottom:1px">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2.5" x2="8" y2="10"></line><polyline points="5,7 8,10 11,7"></polyline><line x1="3.5" y1="13" x2="12.5" y2="13"></line></svg>
+          <span style="font-size:14px;color:#1a1a1a">Import eCAS / CAMS</span>
+        </div>
+
+        <div style="margin-top:auto;border-top:1px solid rgba(0,0,0,0.07);padding-top:6px">
+          <div class="nav" style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;cursor:default">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#444" stroke-width="1.3"><circle cx="8" cy="8" r="2.4"></circle><g stroke-linecap="round"><line x1="8" y1="1.5" x2="8" y2="3.1"></line><line x1="8" y1="12.9" x2="8" y2="14.5"></line><line x1="1.5" y1="8" x2="3.1" y2="8"></line><line x1="12.9" y1="8" x2="14.5" y2="8"></line><line x1="3.6" y1="3.6" x2="4.7" y2="4.7"></line><line x1="11.3" y1="11.3" x2="12.4" y2="12.4"></line><line x1="12.4" y1="3.6" x2="11.3" y2="4.7"></line><line x1="4.7" y1="11.3" x2="3.6" y2="12.4"></line></g></svg>
+            <span style="font-size:14px;color:#1a1a1a">Settings</span>
+          </div>
+          <div class="nav" style="display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:5px;cursor:default">
+            <span style="width:30px;height:30px;border-radius:50%;background:#c9d6e3;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#2b4660">DI</span>
+            <div style="line-height:1.2"><div style="font-size:13px;font-weight:600;color:#1a1a1a">DIY Investor</div><div style="font-size:11px;color:#707070">PAN ****7F</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CONTENT ===== -->
+      <div class="win-scroll" style="flex:1;min-width:0;overflow:auto;background:#f9f9f9;border-top-left-radius:8px;border-left:1px solid rgba(0,0,0,0.04)">
+        <div style="padding:24px 28px 40px;max-width:1180px">
+
+        <sc-if value="{{ showDashEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Dashboard</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">My portfolio</div></div>
+          <div style="max-width:680px;margin:38px auto 0;background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:40px 36px;display:flex;flex-direction:column;align-items:center;text-align:center">
+            <div style="width:60px;height:60px;border:2px dashed #c4c4c4;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px"><svg width="26" height="26" viewBox="0 0 16 16" fill="none" stroke="#9a9a9a" stroke-width="1.3"><rect x="2" y="3" width="12" height="10" rx="1.5"></rect><line x1="2" y1="6.5" x2="14" y2="6.5"></line></svg></div>
+            <div style="font-size:20px;font-weight:600;color:#1a1a1a">Your portfolio is empty</div>
+            <div style="font-size:13px;color:#5e5e5e;margin:6px auto 22px;max-width:430px;line-height:1.55">Import your holdings to see <b>your</b> returns, risk ratios &amp; tax. Your statement is parsed on-device — nothing is uploaded.</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;margin-bottom:22px">
+              <div class="row11" onclick="{{ openImport }}" style="border:1px solid rgba(0,0,0,0.1);border-radius:7px;padding:16px 12px;cursor:default;text-align:left"><div style="width:28px;height:28px;border:1px solid #1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;margin-bottom:8px">PDF</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">Upload eCAS</div><div style="font-size:11px;color:#707070;margin-top:2px">Statement PDF</div></div>
+              <div class="row11" onclick="{{ openImport }}" style="border:1px solid rgba(0,0,0,0.1);border-radius:7px;padding:16px 12px;cursor:default;text-align:left"><div style="width:28px;height:28px;border:1px solid #1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px">↻</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">CAMS + KFintech</div><div style="font-size:11px;color:#707070;margin-top:2px">Auto-sync</div></div>
+              <div class="row11" onclick="{{ openImport }}" style="border:1px solid rgba(0,0,0,0.1);border-radius:7px;padding:16px 12px;cursor:default;text-align:left"><div style="width:28px;height:28px;border:1px solid #1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;margin-bottom:8px">AA</div><div style="font-size:13px;font-weight:600;color:#1a1a1a">Account Aggregator</div><div style="font-size:11px;color:#707070;margin-top:2px">Consent-based</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center">
+              <span class="acc" onclick="{{ openImport }}" style="background:#005FB8;color:#fff;border-radius:4px;padding:10px 20px;font-size:14px;font-weight:600;cursor:default">Import now</span>
+              <span onclick="{{ onPickSample }}" style="font-size:13px;color:#005FB8;font-weight:600;cursor:default">Explore the sample instead</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showDashSample }}" hint-placeholder-val="{{ true }}">
+          <!-- page header -->
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Dashboard</div>
+              <div style="font-size:13px;color:#5e5e5e;margin-top:2px">Your portfolio at a glance</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:12px;color:#707070">Updated 11 Jun, 11:08 PM</span>
+              <div class="std" style="display:flex;align-items:center;gap:7px;background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:6px 13px;cursor:default;box-shadow:0 1px 1px rgba(0,0,0,0.03)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"><path d="M13 5 A6 6 0 1 0 13.5 9"></path><polyline points="13 1.5 13 5 9.5 5"></polyline></svg>
+                <span style="font-size:13px;color:#1a1a1a;font-weight:600">Refresh</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- InfoBar: sample data -->
+          <div style="display:flex;align-items:center;gap:12px;background:#f6f9fd;border:1px solid rgba(0,103,184,0.22);border-radius:5px;padding:11px 14px;margin-bottom:18px">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#005FB8" stroke-width="1.4"><circle cx="8" cy="8" r="6.3"></circle><line x1="8" y1="7.2" x2="8" y2="11.2" stroke-linecap="round"></line><circle cx="8" cy="4.9" r="0.5" fill="#005FB8" stroke="none"></circle></svg>
+            <span style="font-size:13px;color:#1a1a1a;flex:1">You're viewing a <b>sample portfolio</b> — figures below are illustrative, not your holdings.</span>
+            <div class="acc" onclick="{{ openImport }}" style="background:#005FB8;color:#fff;border-radius:4px;padding:6px 14px;font-size:13px;font-weight:600;cursor:default;box-shadow:0 1px 2px rgba(0,0,0,0.12)">Import my portfolio</div>
+          </div>
+
+          <!-- KPI cards -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:16px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Current value</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">₹56,96,590</div>
+              <div style="font-size:11px;color:#707070;margin-top:2px;font-variant-numeric:tabular-nums">Funds ₹42.2L · Shares ₹14.8L</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Invested</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">₹44,05,300</div>
+            </div>
+            <div class="row11" onclick="{{ openReturns }}" style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px;cursor:default">
+              <div style="font-size:12.5px;color:#5e5e5e">Total gain</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#0f7b0f;font-variant-numeric:tabular-nums;margin-top:3px">+₹12,91,290</div>
+              <div style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">▲ 29.3%</div>
+            </div>
+            <div class="row11" onclick="{{ openReturns }}" style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px;cursor:default">
+              <div style="font-size:12.5px;color:#5e5e5e">XIRR</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">18.6%</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">1-day change</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#0f7b0f;font-variant-numeric:tabular-nums;margin-top:3px">+₹47,600</div>
+              <div style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">▲ 0.84%</div>
+            </div>
+          </div>
+
+          <!-- chart + allocation -->
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+                <div>
+                  <div style="font-size:16px;font-weight:600;color:#1a1a1a">Portfolio value</div>
+                  <div style="font-size:12px;margin-top:3px"><span style="color:{{ rangeDeltaColor }};font-weight:600">{{ rangeDelta }}</span> <span style="color:#909090">over {{ rangeLabel }}</span></div>
+                </div>
+                <div style="display:flex;background:#f0f0f0;border-radius:5px;padding:2px;gap:2px;flex-wrap:wrap">
+                  <sc-for list="{{ rangeTabs }}" as="tab" hint-placeholder-count="7">
+                    <span style="{{ tab.style }}" onclick="{{ tab.onClick }}">{{ tab.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="position:relative" onmousemove="{{ onChartHover }}" onmouseleave="{{ clearHover }}">
+              <svg viewBox="0 0 820 220" preserveAspectRatio="none" style="width:100%;height:220px;display:block">
+                <defs><linearGradient id="winfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#005FB8" stop-opacity="0.16"></stop><stop offset="1" stop-color="#005FB8" stop-opacity="0"></stop></linearGradient></defs>
+                <line x1="0" y1="55" x2="820" y2="55" stroke="rgba(0,0,0,0.05)" stroke-width="1"></line>
+                <line x1="0" y1="110" x2="820" y2="110" stroke="rgba(0,0,0,0.05)" stroke-width="1"></line>
+                <line x1="0" y1="165" x2="820" y2="165" stroke="rgba(0,0,0,0.05)" stroke-width="1"></line>
+                <path d="{{ chartArea }}" fill="url(#winfill)"></path>
+                <polyline points="{{ chartLine }}" fill="none" stroke="#005FB8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              </svg>
+              <sc-if value="{{ hoverShow }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:0;bottom:0;width:1px;background:rgba(0,95,184,0.35);pointer-events:none;left:{{ hoverLeftPct }}"></div>
+                <div style="position:absolute;width:10px;height:10px;border-radius:50%;background:#005FB8;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transform:translate(-50%,-50%);pointer-events:none;left:{{ hoverLeftPct }};top:{{ hoverDotTop }}"></div>
+                <div style="position:absolute;transform:translate(-50%,-118%);pointer-events:none;left:{{ hoverLeftPct }};top:{{ hoverDotTop }};background:#1a1a1a;color:#fff;border-radius:5px;padding:5px 10px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25)">
+                  <div style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums">{{ hoverVal }}</div>
+                  <div style="font-size:10px;color:#cdd9e6">{{ hoverLabel }}</div>
+                </div>
+              </sc-if>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#909090;margin-top:8px;font-variant-numeric:tabular-nums">
+                <sc-for list="{{ axisLabels }}" as="l" hint-placeholder-count="4"><span>{{ l.t }}</span></sc-for>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;display:flex;flex-direction:column">
+              <span style="font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:2px">Asset allocation</span>
+              <span style="font-size:11.5px;color:#909090;margin-bottom:6px">by vehicle</span>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px 0">
+                <div style="position:relative;width:148px;height:148px;border-radius:50%;background:conic-gradient(#005FB8 0 74%,#87bce8 74% 100%)">
+                  <div style="position:absolute;inset:26px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:19px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">₹57.0L</span><span style="font-size:11px;color:#707070">total</span></div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#005FB8"></span><span style="color:#3a3a3a">Mutual funds</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">74%</span></div>
+                <div class="row11" onclick="{{ go_stocks }}" style="display:flex;align-items:center;gap:8px;border-radius:4px;margin:-2px -4px;padding:2px 4px;cursor:default"><span style="width:10px;height:10px;border-radius:2px;background:#87bce8"></span><span style="color:#3a3a3a">Direct equity</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">26%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- holdings -->
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px">
+              <span style="font-size:16px;font-weight:600;color:#1a1a1a">Holdings</span>
+              <span style="font-size:12px;color:#707070">6 funds · benchmark Nifty 500 TRI</span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.06);background:#fbfbfb">
+              <span>FUND</span><span style="text-align:right">NAV</span><span style="text-align:right">INVESTED</span><span style="text-align:right">CURRENT</span><span style="text-align:right">GAIN</span><span style="text-align:right">1Y</span>
+            </div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default">
+              <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Parag Parikh Flexi Cap</div><div style="font-size:11.5px;color:#707070">Flexi Cap · Direct</div></div>
+              <span style="text-align:right;font-size:13px;color:#3a3a3a">₹81.34</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,80,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹3,42,500</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+22.3%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">24.6%</span>
+            </div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default">
+              <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">HDFC Mid-Cap Opportunities</div><div style="font-size:11.5px;color:#707070">Mid Cap · Direct</div></div>
+              <span style="text-align:right;font-size:13px;color:#3a3a3a">₹178.60</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹4,50,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹7,10,800</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+57.9%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">41.2%</span>
+            </div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default">
+              <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Quant Small Cap</div><div style="font-size:11.5px;color:#707070">Small Cap · Direct</div></div>
+              <span style="text-align:right;font-size:13px;color:#3a3a3a">₹268.90</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹3,00,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹4,12,400</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+37.5%</span><span style="text-align:right;font-size:13px;color:#c42b1c">19.8%</span>
+            </div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default">
+              <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Mirae Asset Large Cap</div><div style="font-size:11.5px;color:#707070">Large Cap · Direct</div></div>
+              <span style="text-align:right;font-size:13px;color:#3a3a3a">₹98.20</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹5,20,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹6,02,300</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+15.8%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">16.4%</span>
+            </div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 0.9fr 0.9fr;gap:8px;padding:13px 20px;align-items:center;font-variant-numeric:tabular-nums;cursor:default">
+              <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">UTI Nifty 50 Index</div><div style="font-size:11.5px;color:#707070">Index · Direct</div></div>
+              <span style="text-align:right;font-size:13px;color:#3a3a3a">₹142.70</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹4,50,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹5,11,600</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+13.7%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">15.9%</span>
+            </div>
+            <div class="row11" onclick="{{ go_stocks }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 20px;border-top:1px solid rgba(0,0,0,0.06);background:#fbfbfb;cursor:default">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:26px;height:26px;border-radius:6px;background:#eff6fc;color:#005FB8;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#005FB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2.3" y1="13.5" x2="13.7" y2="13.5"></line><rect x="3" y="8" width="2.6" height="4" rx="0.6"></rect><rect x="6.7" y="5" width="2.6" height="7" rx="0.6"></rect><rect x="10.4" y="2.6" width="2.6" height="9.4" rx="0.6"></rect></svg></span>
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Direct equity · 6 stocks</div><div style="font-size:11.5px;color:#707070">held in demat via NSDL eCAS</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;font-variant-numeric:tabular-nums">
+                <span style="font-size:13px;color:#1a1a1a;font-weight:600">₹14,78,090</span>
+                <span style="font-size:13px;color:#0f7b0f">+16.8%</span>
+                <span style="font-size:12px;color:#005FB8;font-weight:600">View →</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== STOCKS / SHARES ===== -->
+        <sc-if value="{{ show.stocks }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Stocks / Shares</div>
+              <div style="font-size:13px;color:#5e5e5e;margin-top:2px">Direct equity held in your demat account</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:12px;color:#707070">LTP as of 12 Jun, 3:30 PM</span>
+              <div class="std" style="display:flex;align-items:center;gap:7px;background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:6px 13px;cursor:default;box-shadow:0 1px 1px rgba(0,0,0,0.03)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-linecap="round"><path d="M13 5 A6 6 0 1 0 13.5 9"></path><polyline points="13 1.5 13 5 9.5 5"></polyline></svg>
+                <span style="font-size:13px;color:#1a1a1a;font-weight:600">Refresh</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- InfoBar: demat source -->
+          <div style="display:flex;align-items:center;gap:12px;background:#f6f9fd;border:1px solid rgba(0,103,184,0.22);border-radius:5px;padding:11px 14px;margin-bottom:18px">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#005FB8" stroke-width="1.4"><rect x="2" y="3" width="12" height="10" rx="1.5"></rect><line x1="2" y1="6.5" x2="14" y2="6.5"></line></svg>
+            <span style="font-size:13px;color:#1a1a1a;flex:1">Holdings synced from your <b>NSDL eCAS</b> demat statement (DP ID ****8120) · 6 scrips.</span>
+            <div class="std" onclick="{{ openImport }}" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.12);border-radius:4px;padding:6px 13px;font-size:13px;color:#1a1a1a;font-weight:600;cursor:default">Re-sync eCAS</div>
+          </div>
+
+          <!-- KPI cards -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:16px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Current value</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">₹14,78,090</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Invested</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">₹12,65,300</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Total gain</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#0f7b0f;font-variant-numeric:tabular-nums;margin-top:3px">+₹2,12,790</div>
+              <div style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">▲ 16.8%</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">1-day change</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#0f7b0f;font-variant-numeric:tabular-nums;margin-top:3px">+₹9,180</div>
+              <div style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">▲ 0.62%</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px">
+              <div style="font-size:12.5px;color:#5e5e5e">Holdings</div>
+              <div style="font-size:22px;font-weight:600;white-space:nowrap;color:#1a1a1a;font-variant-numeric:tabular-nums;margin-top:3px">6 scrips</div>
+              <div style="font-size:12px;color:#707070">5 sectors</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start">
+            <!-- holdings table -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px">
+                <span style="font-size:16px;font-weight:600;color:#1a1a1a">Equity holdings</span>
+                <span style="font-size:12px;color:#707070">benchmark Nifty 50 TRI</span>
+              </div>
+              <div style="overflow-x:auto"><div style="min-width:600px">
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.06);background:#fbfbfb">
+                <span>STOCK</span><span style="text-align:right">LTP</span><span style="text-align:right">INVESTED</span><span style="text-align:right">CURRENT</span><span style="text-align:right">GAIN</span><span style="text-align:right">1D</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Reliance Industries</div><div style="font-size:11.5px;color:#707070">RELIANCE · 120 qty · avg ₹2,480 · Energy</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,945</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,97,600</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹3,53,400</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+18.7%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">▲0.7%</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">HDFC Bank</div><div style="font-size:11.5px;color:#707070">HDFCBANK · 150 qty · avg ₹1,520 · Financials</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹1,712</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,28,000</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹2,56,800</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+12.6%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">▲0.4%</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Infosys</div><div style="font-size:11.5px;color:#707070">INFY · 180 qty · avg ₹1,340 · IT</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹1,558</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,41,200</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹2,80,440</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+16.3%</span><span style="text-align:right;font-size:13px;color:#c42b1c">▼0.5%</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Tata Consultancy Services</div><div style="font-size:11.5px;color:#707070">TCS · 60 qty · avg ₹3,420 · IT</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹3,886</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹2,05,200</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹2,33,160</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+13.6%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">▲0.3%</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">ITC</div><div style="font-size:11.5px;color:#707070">ITC · 400 qty · avg ₹398 · FMCG</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹476</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹1,59,200</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹1,90,400</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+19.6%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">▲0.9%</span>
+              </div>
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 0.9fr 0.8fr;gap:8px;padding:13px 20px;align-items:center;font-variant-numeric:tabular-nums">
+                <div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Larsen &amp; Toubro</div><div style="font-size:11.5px;color:#707070">LT · 45 qty · avg ₹2,980 · Capital Goods</div></div>
+                <span style="text-align:right;font-size:13px;color:#3a3a3a">₹3,642</span><span style="text-align:right;font-size:13px;color:#3a3a3a">₹1,34,100</span><span style="text-align:right;font-size:13px;color:#1a1a1a;font-weight:600">₹1,63,890</span><span style="text-align:right;font-size:13px;color:#0f7b0f">+22.2%</span><span style="text-align:right;font-size:13px;color:#0f7b0f">▲1.1%</span>
+              </div>
+              </div></div>
+            </div>
+
+            <!-- sector allocation -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;display:flex;flex-direction:column">
+              <span style="font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:6px">Sector mix</span>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px 0">
+                <div style="position:relative;width:148px;height:148px;border-radius:50%;background:conic-gradient(#005FB8 0 35%,#2f80c9 35% 59%,#5aa0dd 59% 76%,#87bce8 76% 89%,#b9d4ea 89% 100%)">
+                  <div style="position:absolute;inset:26px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:20px;font-weight:600;color:#1a1a1a">6</span><span style="font-size:11px;color:#707070">scrips</span></div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#005FB8"></span><span style="color:#3a3a3a">IT</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">35%</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#2f80c9"></span><span style="color:#3a3a3a">Energy</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">24%</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#5aa0dd"></span><span style="color:#3a3a3a">Financials</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">17%</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#87bce8"></span><span style="color:#3a3a3a">FMCG</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">13%</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:2px;background:#b9d4ea"></span><span style="color:#3a3a3a">Capital Goods</span><span style="margin-left:auto;color:#1a1a1a;font-variant-numeric:tabular-nums">11%</span></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <!-- ===== EXPLORE ===== -->
+        <sc-if value="{{ show.explore }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Explore funds</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Find and shortlist funds across AMCs</div></div>
+          <div style="background:#f6f9fd;border:1px solid rgba(0,103,184,0.2);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px"><span style="font-size:15px;font-weight:600;color:#1a1a1a">★ Watchlist · 3</span><span style="font-size:12px;color:#707070">set NAV &amp; return alerts</span></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div class="row11" onclick="{{ openFund }}" style="flex:1;min-width:180px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:6px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:default"><span style="font-size:13px;font-weight:600;color:#1a1a1a">SBI Contra</span><span style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">5Y 29.4%</span></div>
+              <div class="row11" onclick="{{ openFund }}" style="flex:1;min-width:180px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:6px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:default"><span style="font-size:13px;font-weight:600;color:#1a1a1a">Nippon Multi Cap</span><span style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">5Y 26.1%</span></div>
+              <div class="row11" onclick="{{ openFund }}" style="flex:1;min-width:180px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:6px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:default"><span style="font-size:13px;font-weight:600;color:#1a1a1a">Edelweiss Bal Adv</span><span style="font-size:12px;color:#0f7b0f;font-variant-numeric:tabular-nums">5Y 17.8%</span></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <span style="background:#eff6fc;border:1px solid rgba(0,103,184,0.35);color:#005FB8;border-radius:14px;padding:5px 13px;font-size:12.5px;font-weight:600">Equity</span>
+            <span style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);color:#3a3a3a;border-radius:14px;padding:5px 13px;font-size:12.5px">Hybrid</span>
+            <span style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);color:#3a3a3a;border-radius:14px;padding:5px 13px;font-size:12.5px">Debt</span>
+            <span style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);color:#3a3a3a;border-radius:14px;padding:5px 13px;font-size:12.5px">Index</span>
+            <span style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);color:#3a3a3a;border-radius:14px;padding:5px 13px;font-size:12.5px">★★★★☆ &amp; up</span>
+            <span style="margin-left:auto;font-size:12px;color:#707070">312 funds · sorted by 5Y CAGR</span>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+            <div style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.9fr;gap:8px;padding:9px 20px;font-size:11.5px;color:#707070;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.06);background:#fbfbfb"><span>FUND</span><span style="text-align:right">3Y / 5Y</span><span style="text-align:right">SHARPE</span><span></span></div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.9fr;gap:8px;padding:12px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default"><div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">SBI Contra Fund</div><div style="font-size:11.5px;color:#707070">Equity · Contra · ★★★★★ · exp 0.62%</div></div><span style="text-align:right;font-size:13px;color:#0f7b0f">24.8% / 29.4%</span><span style="text-align:right;font-size:13px;color:#1a1a1a">1.18</span><div style="text-align:right"><span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:5px 11px;font-size:12px;color:#1a1a1a;font-weight:600;cursor:default">+ Watch</span></div></div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.9fr;gap:8px;padding:12px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default"><div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Nippon India Multi Cap</div><div style="font-size:11.5px;color:#707070">Equity · Multi Cap · ★★★★☆ · exp 0.71%</div></div><span style="text-align:right;font-size:13px;color:#0f7b0f">22.3% / 26.1%</span><span style="text-align:right;font-size:13px;color:#1a1a1a">1.09</span><div style="text-align:right"><span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:5px 11px;font-size:12px;color:#1a1a1a;font-weight:600;cursor:default">+ Watch</span></div></div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.9fr;gap:8px;padding:12px 20px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.045);font-variant-numeric:tabular-nums;cursor:default"><div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Motilal Oswal Midcap</div><div style="font-size:11.5px;color:#707070">Equity · Mid Cap · ★★★★★ · exp 0.66%</div></div><span style="text-align:right;font-size:13px;color:#0f7b0f">31.2% / 28.9%</span><span style="text-align:right;font-size:13px;color:#1a1a1a">1.22</span><div style="text-align:right"><span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:5px 11px;font-size:12px;color:#1a1a1a;font-weight:600;cursor:default">+ Watch</span></div></div>
+            <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.9fr;gap:8px;padding:12px 20px;align-items:center;font-variant-numeric:tabular-nums;cursor:default"><div><div style="font-size:13.5px;font-weight:600;color:#1a1a1a">Edelweiss Balanced Advantage</div><div style="font-size:11.5px;color:#707070">Hybrid · BAF · ★★★★☆ · exp 0.58%</div></div><span style="text-align:right;font-size:13px;color:#0f7b0f">15.1% / 17.8%</span><span style="text-align:right;font-size:13px;color:#1a1a1a">1.34</span><div style="text-align:right"><span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:5px 11px;font-size:12px;color:#1a1a1a;font-weight:600;cursor:default">+ Watch</span></div></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== FUND DETAIL ===== -->
+        <sc-if value="{{ show.fund }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;margin-bottom:16px;flex-wrap:wrap">
+            <span style="width:46px;height:46px;border-radius:8px;background:#eff6fc;color:#005FB8;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700">{{ fund.init }}</span>
+            <div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:600;color:#1a1a1a">{{ fund.name }}</div><div style="font-size:12.5px;color:#707070">{{ fund.sub }}</div></div>
+            <div style="text-align:right"><div style="font-size:12px;color:#707070">NAV (12 Jun)</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ fund.nav }}</div><div style="font-size:12px;color:{{ fund.dayColor }}">{{ fund.day }}</div></div>
+            <div class="acc" style="background:#005FB8;color:#fff;border-radius:4px;padding:9px 18px;font-size:14px;font-weight:600;cursor:default">Invest / SIP</div>
+          </div>
+          <div style="display:flex;gap:22px;border-bottom:1px solid rgba(0,0,0,0.08);margin-bottom:16px;padding:0 2px">
+            <span style="font-size:14px;font-weight:600;color:#1a1a1a;padding:8px 2px;border-bottom:2px solid #005FB8">Overview</span>
+            <span onclick="{{ openReturns }}" style="font-size:14px;color:#5e5e5e;padding:8px 2px;border-bottom:2px solid transparent;cursor:default">Returns</span>
+            <span onclick="{{ openRisk }}" style="font-size:14px;color:#5e5e5e;padding:8px 2px;border-bottom:2px solid transparent;cursor:default">Risk</span>
+            <span style="font-size:14px;color:#5e5e5e;padding:8px 2px;border-bottom:2px solid transparent">Holdings</span>
+            <span style="font-size:14px;color:#5e5e5e;padding:8px 2px;border-bottom:2px solid transparent">Peers</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;align-items:start">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+                <span style="font-size:16px;font-weight:600;color:#1a1a1a">NAV vs benchmark</span>
+                <div style="display:flex;background:#f0f0f0;border-radius:5px;padding:2px;gap:2px;flex-wrap:wrap">
+                  <sc-for list="{{ navTabs }}" as="nt" hint-placeholder-count="5"><span style="{{ nt.style }}" onclick="{{ nt.onClick }}">{{ nt.label }}</span></sc-for>
+                </div>
+              </div>
+              <svg viewBox="0 0 760 200" preserveAspectRatio="none" style="width:100%;height:200px;display:block"><defs><linearGradient id="fdfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#005FB8" stop-opacity="0.15"></stop><stop offset="1" stop-color="#005FB8" stop-opacity="0"></stop></linearGradient></defs><path d="{{ navFundArea }}" fill="url(#fdfill)"></path><polyline points="{{ navBenchLine }}" fill="none" stroke="#b9b9b9" stroke-width="1.8" stroke-dasharray="5 5"></polyline><polyline points="{{ navFundPts }}" fill="none" stroke="#005FB8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:#5e5e5e"><span><span style="color:#005FB8;font-weight:700">—</span> Fund</span><span><span style="color:#b9b9b9;font-weight:700">┄</span> Nifty 500 TRI</span><span style="margin-left:auto;color:#909090">{{ navRangeLabel }}</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+              <div style="font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:12px">Fund facts</div>
+              <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.06);padding-bottom:8px"><span style="color:#5e5e5e">Expense ratio</span><span style="font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ fund.expense }}</span></div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.06);padding-bottom:8px"><span style="color:#5e5e5e">Exit load</span><span style="color:#1a1a1a">{{ fund.exitLoad }}</span></div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.06);padding-bottom:8px"><span style="color:#5e5e5e">Fund age</span><span style="color:#1a1a1a">{{ fund.age }}</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:#5e5e5e">Manager</span><span style="color:#1a1a1a">{{ fund.manager }}</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start">
+            <div class="row11" onclick="{{ openReturns }}" style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;cursor:default">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:600;color:#1a1a1a">Trailing returns (CAGR)</span><span style="font-size:12px;color:#005FB8;font-weight:600">Analyzer →</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;font-variant-numeric:tabular-nums">
+                <div><div style="font-size:11.5px;color:#707070">1Y</div><div style="font-size:18px;font-weight:600;color:#0f7b0f">{{ fund.r1y }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">3Y</div><div style="font-size:18px;font-weight:600;color:#1a1a1a">{{ fund.r3y }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">5Y</div><div style="font-size:18px;font-weight:600;color:#1a1a1a">{{ fund.r5y }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">10Y</div><div style="font-size:18px;font-weight:600;color:#1a1a1a">{{ fund.r10y }}</div></div>
+              </div>
+            </div>
+            <div class="row11" onclick="{{ openRisk }}" style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;cursor:default">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:600;color:#1a1a1a">Risk snapshot</span><span style="font-size:12px;color:#005FB8;font-weight:600">Risk Metrics →</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-variant-numeric:tabular-nums">
+                <div><div style="font-size:11.5px;color:#707070">Alpha</div><div style="font-size:17px;font-weight:600;color:#0f7b0f">{{ fund.alpha }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">Beta</div><div style="font-size:17px;font-weight:600;color:#1a1a1a">{{ fund.beta }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">Sharpe</div><div style="font-size:17px;font-weight:600;color:#1a1a1a">{{ fund.sharpe }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">Sortino</div><div style="font-size:17px;font-weight:600;color:#1a1a1a">{{ fund.sortino }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">Std dev</div><div style="font-size:17px;font-weight:600;color:#1a1a1a">{{ fund.std }}</div></div>
+                <div><div style="font-size:11.5px;color:#707070">Treynor</div><div style="font-size:17px;font-weight:600;color:#1a1a1a">{{ fund.treynor }}</div></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <!-- ===== COMPARE ===== -->
+        <sc-if value="{{ show.compare }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Compare</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Side-by-side across returns, risk &amp; cost</div></div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;margin-bottom:16px">
+            <div style="position:relative;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <span style="font-size:16px;font-weight:600;color:#1a1a1a">Growth of ₹1,00,000</span>
+              <sc-if value="{{ cmpCanAdd }}" hint-placeholder-val="{{ true }}">
+                <span class="acc" onclick="{{ onToggleAdd }}" style="background:#005FB8;border:1px solid #005FB8;border-radius:4px;padding:6px 13px;font-size:12px;color:#fff;font-weight:600;cursor:default">+ Add fund</span>
+              </sc-if>
+              <sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;right:0;top:38px;z-index:50;width:256px;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:7px;box-shadow:0 8px 22px rgba(0,0,0,0.18);padding:5px;max-height:300px;overflow:auto">
+                  <div style="font-size:11px;color:#909090;padding:6px 10px 4px;font-weight:600">Add a fund to compare</div>
+                  <sc-for list="{{ cmpAddable }}" as="af" hint-placeholder-count="4">
+                    <div class="row11" onclick="{{ af.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:5px;cursor:default">
+                      <div style="line-height:1.2"><div style="font-size:13px;font-weight:600;color:#1a1a1a">{{ af.name }}</div><div style="font-size:11px;color:#707070">{{ af.cat }}</div></div>
+                      <span style="font-size:15px;color:#005FB8;font-weight:700">+</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <svg viewBox="0 0 780 200" preserveAspectRatio="none" style="width:100%;height:200px;display:block">
+              <polyline points="0,180 130,174 260,168 390,160 520,154 650,146 780,138" fill="none" stroke="#b9b9b9" stroke-width="1.8" stroke-dasharray="5 5"></polyline>
+              <sc-for list="{{ cmpLines }}" as="cl" hint-placeholder-count="3"><polyline points="{{ cl.points }}" fill="none" stroke="{{ cl.color }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></sc-for>
+            </svg>
+            <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:#5e5e5e;flex-wrap:wrap">
+              <sc-for list="{{ cmpLegend }}" as="lg" hint-placeholder-count="3"><span><span style="color:{{ lg.color }};font-weight:700">—</span> {{ lg.short }}</span></sc-for>
+              <span><span style="color:#b9b9b9;font-weight:700">┄</span> Nifty 500</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+            <div style="overflow-x:auto">
+              <div style="{{ cmpGrid }}">
+                <div style="padding:13px 18px;border-bottom:1px solid rgba(0,0,0,0.08);font-size:13px;font-weight:600;color:#707070">Metric</div>
+                <sc-for list="{{ cmpCols }}" as="col" hint-placeholder-count="3">
+                  <div style="padding:11px 18px 11px;border-bottom:1px solid rgba(0,0,0,0.08);border-left:1px solid rgba(0,0,0,0.05);display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                    <span class="row11" onclick="{{ col.onOpen }}" style="font-size:13px;font-weight:600;color:#1a1a1a;cursor:default;border-radius:4px;padding:2px 3px">{{ col.short }}</span>
+                    <sc-if value="{{ col.removable }}" hint-placeholder-val="{{ true }}"><span onclick="{{ col.onRemove }}" style="font-size:13px;color:#9a9a9a;cursor:default;line-height:1.4;padding:0 2px">✕</span></sc-if>
+                  </div>
+                </sc-for>
+                <sc-for list="{{ cmpRows }}" as="row" hint-placeholder-count="7">
+                  <div style="{{ row.labelStyle }}">{{ row.label }}</div>
+                  <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="3"><div style="{{ cell.style }}">{{ cell.text }}</div></sc-for>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#707070;margin-top:10px">Highlighted cell = best on that metric · click a fund name to open it · ✕ to remove.</div>
+        </sc-if>
+
+        <!-- ===== RETURNS ANALYZER ===== -->
+        <sc-if value="{{ show.returns }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Returns Analyzer</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Trailing &amp; rolling returns vs benchmark</div></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+            <div style="display:flex;background:#f0f0f0;border-radius:5px;padding:2px;gap:2px"><span style="{{ retTrailTab }}" onclick="{{ onRetTrail }}">Trailing</span><span style="{{ retRollTab }}" onclick="{{ onRetRoll }}">Rolling</span></div>
+            <span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:6px 12px;font-size:12.5px;color:#1a1a1a;cursor:default;margin-left:auto">Scope: whole portfolio ⌄</span>
+          </div>
+          <sc-if value="{{ retTrailing }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;margin-bottom:16px">
+            <div style="font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:14px">Trailing CAGR vs benchmark</div>
+            <svg viewBox="0 0 720 180" preserveAspectRatio="none" style="width:100%;height:180px;display:block">
+              <rect x="30" y="70" width="36" height="100" rx="3" fill="#005FB8"></rect><rect x="72" y="92" width="36" height="78" rx="3" fill="#b9d4ea"></rect>
+              <rect x="170" y="52" width="36" height="118" rx="3" fill="#005FB8"></rect><rect x="212" y="82" width="36" height="88" rx="3" fill="#b9d4ea"></rect>
+              <rect x="310" y="40" width="36" height="130" rx="3" fill="#005FB8"></rect><rect x="352" y="70" width="36" height="100" rx="3" fill="#b9d4ea"></rect>
+              <rect x="450" y="58" width="36" height="112" rx="3" fill="#005FB8"></rect><rect x="492" y="86" width="36" height="84" rx="3" fill="#b9d4ea"></rect>
+              <rect x="590" y="66" width="36" height="104" rx="3" fill="#005FB8"></rect><rect x="632" y="94" width="36" height="76" rx="3" fill="#b9d4ea"></rect>
+            </svg>
+            <div style="display:flex;gap:18px;margin-top:8px;font-size:12px;color:#5e5e5e"><span><span style="color:#005FB8;font-weight:700">■</span> Portfolio</span><span><span style="color:#b9d4ea;font-weight:700">■</span> Nifty 500</span><span style="margin-left:auto;color:#909090">1Y · 3Y · 5Y · 7Y · 10Y</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+            <div style="padding:14px 20px 4px;font-size:16px;font-weight:600;color:#1a1a1a">Trailing returns — every fund</div>
+            <div style="padding:0 20px 10px;font-size:11.5px;color:#909090">1D · 1W · 1M · 6M are absolute · 1Y and longer are annualised (CAGR)</div>
+            <div style="overflow-x:auto"><div style="min-width:760px;font-variant-numeric:tabular-nums">
+              <div style="display:grid;grid-template-columns:1.7fr repeat(9,1fr);gap:4px;padding:8px 20px;font-size:11px;color:#707070;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.06);background:#fbfbfb"><span>FUND</span><span style="text-align:right">1D</span><span style="text-align:right">1W</span><span style="text-align:right">1M</span><span style="text-align:right">6M</span><span style="text-align:right">1Y</span><span style="text-align:right">3Y</span><span style="text-align:right">5Y</span><span style="text-align:right">10Y</span><span style="text-align:right">S.INC</span></div>
+              <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:1.7fr repeat(9,1fr);gap:4px;padding:11px 20px;font-size:12.5px;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04);cursor:default"><span style="font-weight:600">PPFAS Flexi Cap</span><span style="text-align:right;color:#0f7b0f">0.8</span><span style="text-align:right;color:#0f7b0f">1.9</span><span style="text-align:right">2.1</span><span style="text-align:right">11.4</span><span style="text-align:right;color:#0f7b0f">24.6</span><span style="text-align:right">21.2</span><span style="text-align:right">18.4</span><span style="text-align:right">17.1</span><span style="text-align:right">19.8</span></div>
+              <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:1.7fr repeat(9,1fr);gap:4px;padding:11px 20px;font-size:12.5px;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04);cursor:default"><span style="font-weight:600">HDFC Mid-Cap Opp</span><span style="text-align:right;color:#0f7b0f">1.1</span><span style="text-align:right;color:#0f7b0f">2.6</span><span style="text-align:right">3.4</span><span style="text-align:right">18.9</span><span style="text-align:right;color:#0f7b0f">41.2</span><span style="text-align:right">29.8</span><span style="text-align:right">24.1</span><span style="text-align:right">19.6</span><span style="text-align:right">18.2</span></div>
+              <div class="row11" onclick="{{ openFund }}" style="display:grid;grid-template-columns:1.7fr repeat(9,1fr);gap:4px;padding:11px 20px;font-size:12.5px;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04);cursor:default"><span style="font-weight:600">Quant Small Cap</span><span style="text-align:right;color:#c42b1c">-0.6</span><span style="text-align:right;color:#0f7b0f">0.4</span><span style="text-align:right;color:#c42b1c">-1.2</span><span style="text-align:right">9.1</span><span style="text-align:right">19.8</span><span style="text-align:right">33.4</span><span style="text-align:right">27.6</span><span style="text-align:right">21.2</span><span style="text-align:right">22.4</span></div>
+              <div class="row11" style="display:grid;grid-template-columns:1.7fr repeat(9,1fr);gap:4px;padding:11px 20px;font-size:12.5px;color:#005FB8;font-weight:600"><span>▸ Nifty 500 TRI</span><span style="text-align:right">0.7</span><span style="text-align:right">1.6</span><span style="text-align:right">1.8</span><span style="text-align:right">9.6</span><span style="text-align:right">19.8</span><span style="text-align:right">17.4</span><span style="text-align:right">15.2</span><span style="text-align:right">13.9</span><span style="text-align:right">14.1</span></div>
+            </div></div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ retRolling }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+              <span style="font-size:13px;color:#5e5e5e">Rolling window:</span>
+              <div style="display:flex;background:#f0f0f0;border-radius:5px;padding:2px;gap:2px"><sc-for list="{{ rollTabs }}" as="rt" hint-placeholder-count="3"><span style="{{ rt.style }}" onclick="{{ rt.onClick }}">{{ rt.label }}</span></sc-for></div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;margin-bottom:16px">
+              <div style="font-size:16px;font-weight:600;color:#1a1a1a">{{ rollWinLabel }} rolling returns</div>
+              <div style="font-size:11.5px;color:#909090;margin-bottom:14px">CAGR for every {{ rollWinLabel }} holding period over the last 7 years · daily observations</div>
+              <svg viewBox="0 0 800 200" preserveAspectRatio="none" style="width:100%;height:200px;display:block">
+                <line x1="0" y1="120" x2="800" y2="120" stroke="#cdd9e6" stroke-width="1.5" stroke-dasharray="5 5"></line>
+                <polyline points="{{ rollLine }}" fill="none" stroke="#005FB8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              </svg>
+              <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:#5e5e5e"><span><span style="color:#005FB8;font-weight:700">—</span> rolling CAGR</span><span><span style="color:#9bb4cc;font-weight:700">┄</span> 12% reference</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Average</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ rollAvg }}</div></div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Maximum</div><div style="font-size:22px;font-weight:600;color:#0f7b0f;font-variant-numeric:tabular-nums">{{ rollMax }}</div></div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Minimum</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ rollMin }}</div></div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">% periods &gt; 12%</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ rollGt12 }}</div></div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">% periods negative</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums">{{ rollNeg }}</div></div>
+            </div>
+          </sc-if>
+        </sc-if>
+        <!-- ===== RISK METRICS ===== -->
+        <sc-if value="{{ show.risk }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Risk Metrics</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Risk-adjusted performance across every fund</div></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:6px 12px;font-size:12.5px;color:#1a1a1a;cursor:default">vs Nifty 500 TRI ⌄</span>
+            <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12.5px;color:#5e5e5e">Period:</span><div style="display:flex;background:#f0f0f0;border-radius:5px;padding:2px;gap:2px"><sc-for list="{{ riskPeriodTabs }}" as="pt" hint-placeholder-count="5"><span style="{{ pt.style }}" onclick="{{ pt.onClick }}">{{ pt.label }}</span></sc-for></div></div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+            <div style="padding:14px 20px 12px;font-size:16px;font-weight:600;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.06)">Risk matrix · all funds</div>
+            <div style="overflow-x:auto"><div style="min-width:640px;font-variant-numeric:tabular-nums">
+              <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr 1fr;font-size:11px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)"><span style="padding:9px 14px">FUND</span><span style="padding:9px 14px;text-align:right">ALPHA</span><span style="padding:9px 14px;text-align:right">BETA</span><span style="padding:9px 14px;text-align:right">SHARPE</span><span style="padding:9px 14px;text-align:right">SORTINO</span><span style="padding:9px 14px;text-align:right">SD</span><span style="padding:9px 14px;text-align:right">MAX DD</span></div>
+              <sc-for list="{{ riskRows }}" as="row" hint-placeholder-count="5">
+                <div class="row11" onclick="{{ row.onOpen }}" style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr 1fr;font-size:12.5px;color:#1a1a1a;cursor:default">
+                  <span style="{{ row.nameStyle }}">{{ row.short }}</span>
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="6"><span style="{{ c.style }}">{{ c.text }}</span></sc-for>
+                </div>
+              </sc-for>
+            </div></div>
+            <div style="padding:10px 20px;font-size:11px;color:#909090;border-top:1px solid rgba(0,0,0,0.06)">Heat: greener = better on that metric · redder = worse.</div>
+          </div>
+        </sc-if>
+
+        <!-- ===== TAX / CAPITAL GAINS ===== -->
+        <sc-if value="{{ show.tax }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Tax / Capital Gains</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Realised gains, harvesting &amp; estimated tax · FY 2025-26</div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Realised LTCG</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;white-space:nowrap">₹18,640</div><div style="font-size:11.5px;color:#707070">equity · &gt;12m</div></div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Realised STCG</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;white-space:nowrap">₹4,200</div><div style="font-size:11.5px;color:#707070">equity · &lt;12m</div></div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">LTCG exemption left</div><div style="font-size:22px;font-weight:600;color:#0f7b0f;font-variant-numeric:tabular-nums;white-space:nowrap">₹1,06,360</div><div style="font-size:11.5px;color:#707070">of ₹1,25,000 / yr</div></div>
+            <div style="background:#f6f9fd;border:1px solid rgba(0,103,184,0.22);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:16px 18px"><div style="font-size:12.5px;color:#5e5e5e">Est. tax payable</div><div style="font-size:22px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;white-space:nowrap">₹840</div><div style="font-size:11.5px;color:#707070">LTCG within exemption</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+              <div style="padding:14px 20px 12px;font-size:16px;font-weight:600;color:#1a1a1a">Realised gains · mutual funds</div>
+              <div style="display:grid;grid-template-columns:1.8fr 1.1fr 1fr 0.9fr;font-variant-numeric:tabular-nums">
+                <span style="padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">FUND</span><span style="padding:8px 14px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">TYPE</span><span style="padding:8px 14px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">GAIN</span><span style="padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">TAX</span>
+                <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">Mirae Large Cap</span><span style="padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.04)"><span style="font-size:10px;color:#0f7b0f;border:1px solid rgba(15,123,15,0.4);border-radius:10px;padding:1px 7px">LTCG · 14m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f;border-bottom:1px solid rgba(0,0,0,0.04)">+₹12,140</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">₹0</span>
+                <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">HDFC Mid-Cap</span><span style="padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.04)"><span style="font-size:10px;color:#0f7b0f;border:1px solid rgba(15,123,15,0.4);border-radius:10px;padding:1px 7px">LTCG · 18m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f;border-bottom:1px solid rgba(0,0,0,0.04)">+₹6,500</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">₹0</span>
+                <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a">Quant Small Cap</span><span style="padding:12px 14px"><span style="font-size:10px;color:#c42b1c;border:1px solid rgba(196,43,28,0.4);border-radius:10px;padding:1px 7px">STCG · 7m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f">+₹4,200</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a">₹840</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="background:#f6f9fd;border:1px solid rgba(0,103,184,0.2);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+                <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:8px">LTCG harvesting</div>
+                <div style="font-size:12.5px;color:#3a3a3a;line-height:1.5">You've used <b>₹18,640</b> of your ₹1.25L tax-free limit. You can still realise <b>₹1,06,360</b> tax-free before <b>31 Mar 2026</b> — sell &amp; rebuy to reset cost basis.</div>
+                <div style="margin-top:12px;height:7px;background:#dfe7ef;border-radius:4px;overflow:hidden"><div style="width:15%;height:100%;background:#005FB8"></div></div>
+              </div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+                <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:10px">Unrealised gains</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;font-variant-numeric:tabular-nums">
+                  <div style="display:flex;justify-content:space-between"><span style="color:#5e5e5e">Long-term (eligible)</span><span style="font-weight:600;color:#0f7b0f">₹8,42,000</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#5e5e5e">Short-term</span><span style="font-weight:600;color:#1a1a1a">₹1,18,000</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden;margin-top:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 12px;flex-wrap:wrap;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:26px;height:26px;border-radius:6px;background:#eff6fc;color:#005FB8;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#005FB8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2.3" y1="13.5" x2="13.7" y2="13.5"></line><rect x="3" y="8" width="2.6" height="4" rx="0.6"></rect><rect x="6.7" y="5" width="2.6" height="7" rx="0.6"></rect><rect x="10.4" y="2.6" width="2.6" height="9.4" rx="0.6"></rect></svg></span>
+                <span style="font-size:16px;font-weight:600;color:#1a1a1a">Realised gains · direct equity (shares)</span>
+              </div>
+              <span style="font-size:10px;color:#005FB8;border:1px solid rgba(0,103,184,0.4);border-radius:10px;padding:1px 8px">NSDL demat</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1.1fr 1fr 0.9fr;font-variant-numeric:tabular-nums">
+              <span style="padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">STOCK</span><span style="padding:8px 14px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">TYPE</span><span style="padding:8px 14px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">GAIN</span><span style="padding:8px 20px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">TAX</span>
+              <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">Reliance Industries</span><span style="padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.04)"><span style="font-size:10px;color:#0f7b0f;border:1px solid rgba(15,123,15,0.4);border-radius:10px;padding:1px 7px">LTCG · 20m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f;border-bottom:1px solid rgba(0,0,0,0.04)">+₹11,800</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">₹0</span>
+              <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">Infosys</span><span style="padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.04)"><span style="font-size:10px;color:#0f7b0f;border:1px solid rgba(15,123,15,0.4);border-radius:10px;padding:1px 7px">LTCG · 15m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f;border-bottom:1px solid rgba(0,0,0,0.04)">+₹9,400</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a;border-bottom:1px solid rgba(0,0,0,0.04)">₹0</span>
+              <span style="padding:12px 20px;font-size:13px;font-weight:600;color:#1a1a1a">ITC</span><span style="padding:12px 14px"><span style="font-size:10px;color:#c42b1c;border:1px solid rgba(196,43,28,0.4);border-radius:10px;padding:1px 7px">STCG · 5m</span></span><span style="padding:12px 14px;font-size:13px;text-align:right;color:#0f7b0f">+₹3,100</span><span style="padding:12px 20px;font-size:13px;text-align:right;color:#1a1a1a">₹620</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:22px;padding:11px 20px;border-top:1px solid rgba(0,0,0,0.06);background:#fbfbfb;font-variant-numeric:tabular-nums">
+              <span style="font-size:12.5px;color:#5e5e5e">Equity LTCG <b style="color:#1a1a1a">₹21,200</b></span>
+              <span style="font-size:12.5px;color:#5e5e5e">Equity STCG <b style="color:#1a1a1a">₹3,100</b></span>
+              <span style="font-size:12.5px;color:#5e5e5e">Est. tax <b style="color:#1a1a1a">₹620</b></span>
+            </div>
+          </div>
+          <div style="font-size:11.5px;color:#707070;line-height:1.6;background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;padding:12px 16px;margin-top:16px">FY 2025-26 · Equity: STCG <b>20%</b> (&lt;12m), LTCG <b>12.5%</b> over ₹1.25L/yr. Debt (post-Apr 2023): taxed at slab. Listed shares &amp; equity mutual funds are taxed identically. Indicative — confirm with your CA.</div>
+        </sc-if>
+        <!-- ===== TRANSACTIONS ===== -->
+        <sc-if value="{{ show.txns }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Transactions</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Every buy, SIP &amp; redemption</div></div>
+          <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+                <sc-for list="{{ txnFilterTabs }}" as="tab" hint-placeholder-count="5">
+                  <span onclick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }}</span>
+                </sc-for>
+                <span style="margin-left:auto;font-size:12px;color:#707070;align-self:center">{{ txnCount }} shown</span>
+                <span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.09);border-radius:4px;padding:5px 11px;font-size:12px;color:#1a1a1a;cursor:default">⤓ Export</span>
+              </div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">
+                <div style="display:grid;grid-template-columns:1fr 1.6fr 0.9fr 0.9fr 1fr;font-variant-numeric:tabular-nums">
+                  <span style="padding:9px 18px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">DATE</span><span style="padding:9px 14px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">FUND</span><span style="padding:9px 14px;font-size:11.5px;color:#707070;font-weight:600;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">TYPE</span><span style="padding:9px 14px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">UNITS</span><span style="padding:9px 18px;font-size:11.5px;color:#707070;font-weight:600;text-align:right;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)">AMOUNT</span>
+                  <sc-for list="{{ txnRows }}" as="r" hint-placeholder-count="6">
+                    <span style="{{ r.dateStyle }}">{{ r.date }}</span>
+                    <span style="{{ r.nameStyle }}">{{ r.name }}</span>
+                    <span style="{{ r.typeCellStyle }}"><span style="{{ r.badgeStyle }}">{{ r.badgeText }}</span></span>
+                    <span style="{{ r.unitStyle }}">{{ r.units }}</span>
+                    <span style="{{ r.amtStyle }}">{{ r.amount }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+                <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:10px">Active SIPs · ₹35k/mo</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px">
+                  <div style="display:flex;justify-content:space-between"><span style="color:#3a3a3a">PPFAS Flexi · 5th</span><span style="color:#1a1a1a;font-variant-numeric:tabular-nums">₹10,000</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#3a3a3a">HDFC Mid-Cap · 5th</span><span style="color:#1a1a1a;font-variant-numeric:tabular-nums">₹15,000</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#3a3a3a">ICICI Bal Adv · 12th</span><span style="color:#1a1a1a;font-variant-numeric:tabular-nums">₹10,000</span></div>
+                </div>
+              </div>
+              <div class="row11" onclick="{{ openTax }}" style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px;cursor:default">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:15px;font-weight:600;color:#1a1a1a">Realised gains · FY26</span><span style="font-size:12px;color:#005FB8;font-weight:600">Tax →</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;font-variant-numeric:tabular-nums">
+                  <div style="display:flex;justify-content:space-between"><span style="color:#5e5e5e">LTCG</span><span style="color:#1a1a1a">₹18,640</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#5e5e5e">STCG</span><span style="color:#1a1a1a">₹4,200</span></div>
+                  <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(0,0,0,0.06);padding-top:8px"><span style="color:#5e5e5e">Est. tax</span><span style="font-weight:600;color:#1a1a1a">₹840</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== IMPORT ===== -->
+        <sc-if value="{{ show.import }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:16px"><div style="font-size:28px;font-weight:600;color:#1a1a1a;letter-spacing:-.01em">Import eCAS / CAMS</div><div style="font-size:13px;color:#5e5e5e;margin-top:2px">Bring in your funds and demat shares from one consolidated statement</div></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:18px;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:7px;color:#1a1a1a;font-weight:600"><span style="width:22px;height:22px;border-radius:50%;background:#005FB8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px">1</span>Upload</span>
+            <span style="width:26px;height:2px;background:#005FB8"></span>
+            <span style="display:flex;align-items:center;gap:7px;color:#707070"><span style="width:22px;height:22px;border-radius:50%;border:1.5px solid #c4c4c4;display:flex;align-items:center;justify-content:center;font-size:11px">2</span>Read &amp; map</span>
+            <span style="width:26px;height:2px;background:#d8d8d8"></span>
+            <span style="display:flex;align-items:center;gap:7px;color:#707070"><span style="width:22px;height:22px;border-radius:50%;border:1.5px solid #c4c4c4;display:flex;align-items:center;justify-content:center;font-size:11px">3</span>Review</span>
+            <span style="width:26px;height:2px;background:#d8d8d8"></span>
+            <span style="display:flex;align-items:center;gap:7px;color:#707070"><span style="width:22px;height:22px;border-radius:50%;border:1.5px solid #c4c4c4;display:flex;align-items:center;justify-content:center;font-size:11px">4</span>Import</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:20px 22px">
+              <div style="font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:4px">Upload your statement</div>
+              <div style="font-size:12.5px;color:#5e5e5e;margin-bottom:16px;line-height:1.5">Upload a <b>NSDL CAS (eCAS)</b> or <b>CAMS + KFintech</b> consolidated statement PDF. We read every mutual-fund folio <b>and your demat equity holdings (shares)</b>, transactions and current price — no broker login needed.</div>
+              <div style="border:2px dashed #c4c4c4;border-radius:8px;background:#fafafa;padding:34px;text-align:center">
+                <div style="width:44px;height:44px;border:1.5px solid #1a1a1a;border-radius:8px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#1a1a1a">PDF</div>
+                <div style="font-size:14px;font-weight:600;color:#1a1a1a">Drag &amp; drop your statement here</div>
+                <div style="font-size:12px;color:#707070;margin:4px 0 14px">or</div>
+                <span class="acc" style="background:#005FB8;color:#fff;border-radius:4px;padding:8px 18px;font-size:13px;font-weight:600;cursor:default">Choose PDF</span>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:12px;margin-top:16px">
+                <div style="flex:1"><div style="font-size:11.5px;color:#707070;margin-bottom:5px">PDF PASSWORD (usually your PAN)</div><div style="border:1px solid rgba(0,0,0,0.18);border-radius:4px;padding:8px 12px;font-size:13px;color:#9a9a9a;background:#fff">••••••••</div></div>
+                <span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.12);border-radius:4px;padding:8px 14px;font-size:13px;color:#1a1a1a;font-weight:600;cursor:default;white-space:nowrap">Read statement</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);padding:18px 20px">
+                <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:10px">What we read</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:#3a3a3a">
+                  <div style="display:flex;gap:8px"><span style="color:#0f7b0f">✓</span> Every MF folio &amp; fund</div>
+                  <div style="display:flex;gap:8px"><span style="color:#0f7b0f">✓</span> Demat shares &amp; ETFs (NSDL)</div>
+                  <div style="display:flex;gap:8px"><span style="color:#0f7b0f">✓</span> Full transaction history</div>
+                  <div style="display:flex;gap:8px"><span style="color:#0f7b0f">✓</span> Units / qty, price &amp; value</div>
+                  <div style="display:flex;gap:8px"><span style="color:#0f7b0f">✓</span> Auto XIRR + cost basis</div>
+                </div>
+              </div>
+              <div style="background:#f6f9fd;border:1px solid rgba(0,103,184,0.2);border-radius:8px;padding:14px 16px;font-size:12px;color:#3a3a3a;line-height:1.5"><b>🔒 Processed on your device.</b> The PDF and password are parsed locally — never uploaded.</div>
+            </div>
+          </div>
+
+          <!-- Review stage: detected holdings preview -->
+          <div style="background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden;margin-top:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 13px;flex-wrap:wrap;gap:10px">
+              <div>
+                <span style="font-size:16px;font-weight:600;color:#1a1a1a">Detected in your statement</span>
+                <div style="font-size:12px;color:#707070;margin-top:2px">Review &amp; map before importing · 6 MF folios + 6 demat scrips found</div>
+              </div>
+              <span style="font-size:11px;color:#0f7b0f;border:1px solid rgba(15,123,15,0.4);border-radius:10px;padding:2px 10px">✓ Parsed on-device</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(0,0,0,0.06)">
+              <div style="border-right:1px solid rgba(0,0,0,0.06)">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)"><span style="font-size:11px;font-weight:600;color:#707070;letter-spacing:.02em">MUTUAL FUNDS · CAMS/KFIN</span><span style="font-size:12px;color:#1a1a1a;font-weight:600;font-variant-numeric:tabular-nums">₹42.2L</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">PPFAS Flexi Cap</span><span style="font-size:12.5px;color:#3a3a3a">₹3,42,500</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">HDFC Mid-Cap Opp</span><span style="font-size:12.5px;color:#3a3a3a">₹7,10,800</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Quant Small Cap</span><span style="font-size:12.5px;color:#3a3a3a">₹4,12,400</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Mirae Large Cap</span><span style="font-size:12.5px;color:#3a3a3a">₹6,02,300</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">UTI Nifty 50 Index</span><span style="font-size:12.5px;color:#3a3a3a">₹5,11,600</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">ICICI Pru Bal Adv</span><span style="font-size:12.5px;color:#3a3a3a">₹16,38,900</span></div>
+              </div>
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#fbfbfb;border-bottom:1px solid rgba(0,0,0,0.06)"><span style="font-size:11px;font-weight:600;color:#707070;letter-spacing:.02em">DEMAT SHARES · NSDL eCAS</span><span style="font-size:12px;color:#1a1a1a;font-weight:600;font-variant-numeric:tabular-nums">₹14.8L</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Reliance Industries <span style="color:#909090">· 120</span></span><span style="font-size:12.5px;color:#3a3a3a">₹3,53,400</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">HDFC Bank <span style="color:#909090">· 150</span></span><span style="font-size:12.5px;color:#3a3a3a">₹2,56,800</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Infosys <span style="color:#909090">· 180</span></span><span style="font-size:12.5px;color:#3a3a3a">₹2,80,440</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Tata Consultancy <span style="color:#909090">· 60</span></span><span style="font-size:12.5px;color:#3a3a3a">₹2,33,160</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid rgba(0,0,0,0.04);font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">ITC <span style="color:#909090">· 400</span></span><span style="font-size:12.5px;color:#3a3a3a">₹1,90,400</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;font-variant-numeric:tabular-nums"><span style="font-size:12.5px;color:#1a1a1a">Larsen &amp; Toubro <span style="color:#909090">· 45</span></span><span style="font-size:12.5px;color:#3a3a3a">₹1,63,890</span></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid rgba(0,0,0,0.06);gap:12px;flex-wrap:wrap">
+              <span style="font-size:12.5px;color:#5e5e5e">Combined value <b style="color:#1a1a1a;font-variant-numeric:tabular-nums">₹56,96,590</b> across 12 holdings</span>
+              <div style="display:flex;gap:10px">
+                <span class="std" style="background:#fbfbfb;border:1px solid rgba(0,0,0,0.12);border-radius:4px;padding:8px 14px;font-size:13px;color:#1a1a1a;font-weight:600;cursor:default">Edit mapping</span>
+                <span class="acc" onclick="{{ go_dashboard }}" style="background:#005FB8;color:#fff;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:600;cursor:default;box-shadow:0 1px 2px rgba(0,0,0,0.12)">Import 12 holdings</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  state = { screen: 'dashboard', range: '3Y', portMode: 'sample', portOpen: false, navRange: '3Y', hoverIdx: null, fund: 'ppfas', compareIds: ['quantsmall','hdfcmid','ppfas'], addOpen: false, retView: 'trailing', rollWin: '3Y', riskPeriod: '3Y', txnFilter: 'All' };
+  TXNS = [
+    { d:'10 Jun 26', n:'Reliance Industries', cat:'Equity', t:'BUY',    c:'#005FB8', b:'rgba(0,103,184,0.4)', u:'40',     a:'\u20b91,17,800', neg:false },
+    { d:'09 Jun 26', n:'ITC',                 cat:'Equity', t:'SELL',   c:'#c42b1c', b:'rgba(196,43,28,0.4)', u:'-100',   a:'-\u20b947,600',  neg:true  },
+    { d:'05 Jun 26', n:'PPFAS Flexi Cap',     cat:'SIP',    t:'SIP',    c:'#0f7b0f', b:'rgba(15,123,15,0.4)', u:'123.4',  a:'\u20b910,000',   neg:false },
+    { d:'22 May 26', n:'Quant Small Cap',     cat:'Lumpsum',t:'LUMP',   c:'#005FB8', b:'rgba(0,103,184,0.4)', u:'382.6',  a:'\u20b91,00,000', neg:false },
+    { d:'18 Apr 26', n:'Mirae Large Cap',     cat:'Redemption',t:'REDEEM',c:'#c42b1c',b:'rgba(196,43,28,0.4)',u:'-516.5', a:'-\u20b950,000',  neg:true  },
+    { d:'05 Apr 26', n:'HDFC Mid-Cap Opp',    cat:'SIP',    t:'SIP',    c:'#0f7b0f', b:'rgba(15,123,15,0.4)', u:'88.7',   a:'\u20b915,000',   neg:false },
+    { d:'28 Mar 26', n:'Infosys',             cat:'Equity', t:'BUY',    c:'#005FB8', b:'rgba(0,103,184,0.4)', u:'30',     a:'\u20b946,740',   neg:false },
+    { d:'15 Mar 26', n:'HDFC Bank',           cat:'Equity', t:'BUY',    c:'#005FB8', b:'rgba(0,103,184,0.4)', u:'50',     a:'\u20b985,600',   neg:false },
+    { d:'10 Mar 26', n:'PPFAS Flexi Cap',     cat:'SIP',    t:'SIP',    c:'#0f7b0f', b:'rgba(15,123,15,0.4)', u:'118.9',  a:'\u20b910,000',   neg:false },
+    { d:'05 Feb 26', n:'ICICI Bal Adv',       cat:'Lumpsum',t:'LUMP',   c:'#005FB8', b:'rgba(0,103,184,0.4)', u:'805.2',  a:'\u20b950,000',   neg:false },
+  ];
+  FUNDS = {
+    ppfas:      { init:'PP', name:'Parag Parikh Flexi Cap · Direct Growth', sub:'Flexi Cap · ★★★★★ · AUM ₹81,240 Cr · Nifty 500 TRI', nav:'₹81.34', day:'▲ 0.84%', dayColor:'#0f7b0f', expense:'0.63%', exitLoad:'2% < 365d', age:'11.3 yrs', manager:'R. Kothari', r1y:'24.6%', r3y:'21.2%', r5y:'18.4%', r10y:'17.1%', alpha:'+3.2', beta:'0.84', sharpe:'1.21', sortino:'1.74', std:'13.1%', treynor:'0.19' },
+    hdfcmid:    { init:'HD', name:'HDFC Mid-Cap Opportunities · Direct Growth', sub:'Mid Cap · ★★★★☆ · AUM ₹75,600 Cr · Nifty Midcap 150 TRI', nav:'₹178.60', day:'▲ 1.05%', dayColor:'#0f7b0f', expense:'0.74%', exitLoad:'1% < 365d', age:'17.0 yrs', manager:'C. Gupta', r1y:'41.2%', r3y:'29.8%', r5y:'24.1%', r10y:'19.6%', alpha:'+5.4', beta:'0.96', sharpe:'1.38', sortino:'1.92', std:'16.8%', treynor:'0.24' },
+    quantsmall: { init:'QS', name:'Quant Small Cap · Direct Growth', sub:'Small Cap · ★★★★☆ · AUM ₹26,300 Cr · Nifty Smallcap 250 TRI', nav:'₹268.90', day:'▼ 0.62%', dayColor:'#c42b1c', expense:'0.77%', exitLoad:'1% < 365d', age:'9.4 yrs', manager:'S. Sandeep', r1y:'19.8%', r3y:'33.4%', r5y:'27.6%', r10y:'21.2%', alpha:'+2.1', beta:'1.18', sharpe:'0.94', sortino:'1.31', std:'19.4%', treynor:'0.16' },
+    mirae:      { init:'MA', name:'Mirae Asset Large Cap · Direct Growth', sub:'Large Cap · ★★★★☆ · AUM ₹38,900 Cr · Nifty 100 TRI', nav:'₹98.20', day:'▲ 0.41%', dayColor:'#0f7b0f', expense:'0.54%', exitLoad:'1% < 365d', age:'12.1 yrs', manager:'G. Sachdeva', r1y:'16.4%', r3y:'15.1%', r5y:'13.9%', r10y:'13.4%', alpha:'+1.4', beta:'0.99', sharpe:'1.08', sortino:'1.52', std:'11.9%', treynor:'0.14' },
+    uti:        { init:'UT', name:'UTI Nifty 50 Index · Direct Growth', sub:'Index · ★★★★☆ · AUM ₹18,400 Cr · Nifty 50 TRI', nav:'₹142.70', day:'▲ 0.55%', dayColor:'#0f7b0f', expense:'0.20%', exitLoad:'Nil', age:'10.2 yrs', manager:'S. Patil', r1y:'15.9%', r3y:'14.2%', r5y:'13.4%', r10y:'12.9%', alpha:'+0.2', beta:'1.00', sharpe:'1.05', sortino:'1.46', std:'12.4%', treynor:'0.13' },
+    icici:      { init:'IC', name:'ICICI Pru Balanced Advantage · Direct Growth', sub:'Hybrid BAF · ★★★★☆ · AUM ₹62,100 Cr · CRISIL Hybrid 50+50', nav:'₹62.10', day:'▲ 0.32%', dayColor:'#0f7b0f', expense:'0.88%', exitLoad:'1% < 365d', age:'13.5 yrs', manager:'S. Naren', r1y:'14.1%', r3y:'12.6%', r5y:'11.8%', r10y:'11.2%', alpha:'+1.1', beta:'0.61', sharpe:'1.32', sortino:'1.88', std:'8.4%', treynor:'0.18' },
+    sbicontra:  { init:'SB', name:'SBI Contra Fund · Direct Growth', sub:'Contra · ★★★★★ · AUM ₹41,200 Cr · BSE 500 TRI', nav:'₹412.80', day:'▲ 0.74%', dayColor:'#0f7b0f', expense:'0.62%', exitLoad:'1% < 365d', age:'14.2 yrs', manager:'D. Singh', r1y:'27.4%', r3y:'24.8%', r5y:'29.4%', r10y:'18.9%', alpha:'+4.6', beta:'0.92', sharpe:'1.18', sortino:'1.66', std:'14.8%', treynor:'0.21' },
+    nippon:     { init:'NI', name:'Nippon India Multi Cap · Direct Growth', sub:'Multi Cap · ★★★★☆ · AUM ₹39,800 Cr · Nifty 500 Multicap TRI', nav:'₹298.40', day:'▲ 0.66%', dayColor:'#0f7b0f', expense:'0.71%', exitLoad:'1% < 365d', age:'19.0 yrs', manager:'S. Tandon', r1y:'25.1%', r3y:'22.3%', r5y:'26.1%', r10y:'17.4%', alpha:'+3.8', beta:'1.04', sharpe:'1.09', sortino:'1.54', std:'15.6%', treynor:'0.19' },
+    motilal:    { init:'MO', name:'Motilal Oswal Midcap · Direct Growth', sub:'Mid Cap · ★★★★★ · AUM ₹20,100 Cr · Nifty Midcap 150 TRI', nav:'₹112.30', day:'▲ 1.18%', dayColor:'#0f7b0f', expense:'0.66%', exitLoad:'1% < 365d', age:'9.8 yrs', manager:'N. Agrawal', r1y:'38.6%', r3y:'31.2%', r5y:'28.9%', r10y:'20.4%', alpha:'+6.1', beta:'1.02', sharpe:'1.22', sortino:'1.74', std:'17.2%', treynor:'0.23' },
+    edelweiss:  { init:'ED', name:'Edelweiss Balanced Advantage · Direct Growth', sub:'Hybrid BAF · ★★★★☆ · AUM ₹11,900 Cr · CRISIL Hybrid 50+50', nav:'₹49.80', day:'▲ 0.28%', dayColor:'#0f7b0f', expense:'0.58%', exitLoad:'1% < 365d', age:'11.6 yrs', manager:'B. Thakkar', r1y:'16.8%', r3y:'15.1%', r5y:'17.8%', r10y:'12.6%', alpha:'+1.0', beta:'0.59', sharpe:'1.34', sortino:'1.88', std:'8.0%', treynor:'0.19' },
+  };
+  go(s){
+    this.setState({ screen: s, portOpen: false });
+    try { const c = document.querySelector('.win-scroll'); if (c) c.scrollTop = 0; } catch(e){}
+  }
+  openFund(e){
+    let id = this.state.fund;
+    try {
+      const t = (e && e.currentTarget && e.currentTarget.textContent) || '';
+      const map = [['Parag Parikh','ppfas'],['PPFAS','ppfas'],['HDFC Mid','hdfcmid'],['Quant Small','quantsmall'],['Mirae','mirae'],['UTI Nifty','uti'],['ICICI','icici'],['SBI Contra','sbicontra'],['Nippon','nippon'],['Motilal','motilal'],['Edelweiss','edelweiss']];
+      for (let i=0;i<map.length;i++){ if (t.indexOf(map[i][0]) !== -1){ id = map[i][1]; break; } }
+    } catch(err){}
+    this.setState({ screen: 'fund', fund: id, portOpen: false });
+    try { const c = document.querySelector('.win-scroll'); if (c) c.scrollTop = 0; } catch(e2){}
+  }
+  setRetView(v){ this.setState({ retView: v }); }
+  setRollWin(w){ this.setState({ rollWin: w }); }
+  setRiskPeriod(p){ this.setState({ riskPeriod: p }); }
+  setTxnFilter(f){ this.setState({ txnFilter: f }); }
+  pillStyle(on){ return on
+    ? { fontSize:'12.5px', color:'#1a1a1a', fontWeight:600, padding:'5px 12px', borderRadius:'4px', background:'#fff', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', cursor:'default' }
+    : { fontSize:'12.5px', color:'#5e5e5e', fontWeight:400, padding:'5px 12px', borderRadius:'4px', cursor:'default' }; }
+  toggleAdd(){ this.setState(st => ({ addOpen: !st.addOpen })); }
+  addCompare(id){ this.setState(st => st.compareIds.indexOf(id) === -1 ? { compareIds: st.compareIds.concat(id), addOpen: false } : { addOpen: false }); }
+  removeCompare(id){ this.setState(st => st.compareIds.length > 2 ? { compareIds: st.compareIds.filter(x => x !== id) } : {}); }
+  openFundById(id){ this.setState({ screen:'fund', fund:id, portOpen:false }); try { const c = document.querySelector('.win-scroll'); if (c) c.scrollTop = 0; } catch(e){} }
+  setRange(r){ this.setState({ range: r, hoverIdx: null }); }
+  setNavRange(r){ this.setState({ navRange: r }); }
+  togglePort(){ this.setState(st => ({ portOpen: !st.portOpen })); }
+  pickPort(mode){ this.setState({ portMode: mode, portOpen: false, screen: 'dashboard' }); try { const c = document.querySelector('.win-scroll'); if (c) c.scrollTop = 0; } catch(e){} }
+  onChartHover(e){
+    try {
+      const r = e.currentTarget.getBoundingClientRect();
+      const ratio = (e.clientX - r.left) / r.width;
+      const counts = {'1W':7,'3M':12,'6M':12,'1Y':12,'3Y':9,'5Y':11,'Max':12};
+      const nn = counts[this.state.range] || 9;
+      let idx = Math.round(ratio * (nn - 1));
+      idx = Math.max(0, Math.min(nn - 1, idx));
+      if (idx !== this.state.hoverIdx) this.setState({ hoverIdx: idx });
+    } catch(err){}
+  }
+  clearHover(){ this.setState({ hoverIdx: null }); }
+  fmtINR(x){ x = Math.round(x); const s = String(x); const l3 = s.slice(-3); let rest = s.slice(0, -3); if (rest) rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ','); return '\u20b9' + (rest ? rest + ',' : '') + l3; }
+  renderVals(){
+    const s = this.state.screen;
+    const ids = ['dashboard','stocks','explore','fund','compare','returns','risk','tax','txns','import'];
+    const act = {}, show = {}, h = {};
+    ids.forEach(id => { act[id] = (id===s) ? 'true' : 'false'; h['go_'+id] = ()=>this.go(id); });
+    show[s] = true;
+
+    // ---- Portfolio value chart, range-driven ----
+    const series = {
+      '1W':  { ys:[142,150,137,147,133,128,134], labels:['Fri','Sat','Sun','Mon','Tue','Wed','Thu'], delta:'+0.9%',  up:true, vlo:4180000, vhi:4218500 },
+      '3M':  { ys:[165,156,160,144,150,136,142,128,134,122,116,110], labels:['Mar','Apr','May','Jun'], delta:'+4.2%',  up:true, vlo:4048000, vhi:4218500 },
+      '6M':  { ys:[178,168,172,152,160,146,150,134,128,120,112,104], labels:['Jan','Mar','May','Jun'], delta:'+8.6%',  up:true, vlo:3884000, vhi:4218500 },
+      '1Y':  { ys:[182,168,172,150,158,138,146,126,134,116,106,96],  labels:['Jun 25','Sep','Dec','Mar','Jun 26'], delta:'+16.2%', up:true, vlo:3630000, vhi:4218500 },
+      '3Y':  { ys:[175,150,158,120,128,90,103,66,38],                labels:['Jun 2023','Jun 2024','Jun 2025','Jun 2026'], delta:'+34.3%', up:true, vlo:3140000, vhi:4218500 },
+      '5Y':  { ys:[186,172,166,150,140,118,128,92,78,52,32],         labels:['2021','2023','2025','2026'], delta:'+112%', up:true, vlo:1990000, vhi:4218500 },
+      'Max': { ys:[192,178,172,150,140,116,106,78,64,40,26,16],      labels:['2013','2017','2021','2026'], delta:'+168%', up:true, vlo:1570000, vhi:4218500 },
+    };
+    const order = ['1W','3M','6M','1Y','3Y','5Y','Max'];
+    const cur = series[this.state.range] || series['3Y'];
+    const n = cur.ys.length;
+    const coords = cur.ys.map((y,i)=>[Math.round(i/(n-1)*820), y]);
+    const chartLine = coords.map(c=>c.join(',')).join(' ');
+    const chartArea = 'M' + coords.map(c=>c.join(',')).join(' L') + ' L820,220 L0,220 Z';
+    const axisLabels = cur.labels.map(t=>({ t }));
+    const rangeTabs = order.map(r=>{
+      const on = r===this.state.range;
+      return { label:r, onClick:()=>this.setRange(r),
+        style: on
+          ? { fontSize:'12px', color:'#1a1a1a', fontWeight:600, padding:'4px 11px', borderRadius:'4px', background:'#fff', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', cursor:'default' }
+          : { fontSize:'12px', color:'#5e5e5e', fontWeight:400, padding:'4px 11px', borderRadius:'4px', cursor:'default' } };
+    });
+
+    // ---- hover tooltip (dashboard chart) ----
+    const maxY = Math.max(...cur.ys), minY = Math.min(...cur.ys);
+    const hi = this.state.hoverIdx;
+    const hoverShow = hi !== null && hi >= 0 && hi < n;
+    let hoverLeftPct = '0%', hoverDotTop = '0px', hoverVal = '', hoverLabel = '';
+    if (hoverShow) {
+      const t = (maxY - cur.ys[hi]) / ((maxY - minY) || 1);
+      hoverLeftPct = (hi / (n - 1) * 100).toFixed(2) + '%';
+      hoverDotTop = cur.ys[hi] + 'px';
+      hoverVal = this.fmtINR(cur.vlo + t * (cur.vhi - cur.vlo));
+      hoverLabel = cur.labels[Math.min(cur.labels.length - 1, Math.round(hi / (n - 1) * (cur.labels.length - 1)))];
+    }
+
+    // ---- Fund Detail: NAV vs benchmark, range-driven ----
+    const navSeries = {
+      '1M': { f:[160,150,156,140,148,134,142,128,136], b:[166,160,162,152,156,148,150,142,146] },
+      '6M': { f:[168,156,160,140,148,128,138,108,120,96,104,80], b:[172,164,166,152,156,144,148,132,138,124,128,116] },
+      '1Y': { f:[176,162,168,144,152,124,134,100,112,84,92,64], b:[180,170,172,156,160,146,150,134,140,126,130,118] },
+      '3Y': { f:[160,140,148,110,118,82,94,58,32], b:[168,160,164,150,154,140,144,130,120] },
+      '5Y': { f:[180,166,170,150,140,116,126,88,72,44,24], b:[184,172,174,158,162,146,150,132,124,108,96] },
+    };
+    const navOrder = ['1M','6M','1Y','3Y','5Y'];
+    const ncur = navSeries[this.state.navRange] || navSeries['3Y'];
+    const nf = ncur.f.length, nb = ncur.b.length;
+    const navFundPts = ncur.f.map((y,i)=>Math.round(i/(nf-1)*760)+','+y).join(' ');
+    const navBenchLine = ncur.b.map((y,i)=>Math.round(i/(nb-1)*760)+','+y).join(' ');
+    const navFundArea = 'M' + ncur.f.map((y,i)=>Math.round(i/(nf-1)*760)+','+y).join(' L') + ' L760,200 L0,200 Z';
+    const navTabs = navOrder.map(r=>{
+      const on = r===this.state.navRange;
+      return { label:r, onClick:()=>this.setNavRange(r),
+        style: on
+          ? { fontSize:'12px', color:'#1a1a1a', fontWeight:600, padding:'4px 11px', borderRadius:'4px', background:'#fff', boxShadow:'0 1px 2px rgba(0,0,0,0.08)', cursor:'default' }
+          : { fontSize:'12px', color:'#5e5e5e', fontWeight:400, padding:'4px 11px', borderRadius:'4px', cursor:'default' } };
+    });
+
+    // ---- Returns Analyzer: Trailing vs Rolling ----
+    const retView = this.state.retView;
+    const retTrailTab = this.pillStyle(retView==='trailing');
+    const retRollTab = this.pillStyle(retView==='rolling');
+    const rollData = {
+      '1Y': { ys:[70,40,96,54,120,58,30,102,46,84,34,76,50], avg:'18.2%', max:'41.4%', min:'-9.6%', gt12:'64%', neg:'12%', label:'1-year' },
+      '3Y': { ys:[92,62,100,56,110,72,46,96,56,80,40,76,52], avg:'19.4%', max:'34.1%', min:'6.2%',  gt12:'84%', neg:'0%',  label:'3-year' },
+      '5Y': { ys:[96,84,100,80,104,86,72,92,78,88,74,84,76], avg:'17.8%', max:'26.9%', min:'9.1%',  gt12:'96%', neg:'0%',  label:'5-year' },
+    };
+    const rollCur = rollData[this.state.rollWin] || rollData['3Y'];
+    const rn = rollCur.ys.length;
+    const rollLine = rollCur.ys.map((y,i)=> Math.round(i/(rn-1)*800)+','+y).join(' ');
+    const rollTabs = ['1Y','3Y','5Y'].map(w => ({ label:w, onClick:()=>this.setRollWin(w), style:this.pillStyle(w===this.state.rollWin) }));
+
+    // ---- Risk Metrics: period-driven matrix ----
+    const riskList = [['ppfas','PPFAS Flexi'],['hdfcmid','HDFC Mid-Cap'],['quantsmall','Quant Small'],['mirae','Mirae Large'],['icici','ICICI Bal Adv']];
+    const baseMatrix = {
+      ppfas:[3.2,0.84,1.21,1.74,13.1,-22.4], hdfcmid:[5.4,0.96,1.38,1.92,16.8,-26.4],
+      quantsmall:[2.1,1.18,0.94,1.31,19.4,-31.2], mirae:[1.4,0.99,1.08,1.52,11.9,-18.6], icici:[1.1,0.61,1.32,1.88,8.4,-11.2],
+    };
+    const pf = { '3M':[0.6,1.08,0.72,0.74,1.22,0.78], '6M':[0.75,1.05,0.82,0.84,1.15,0.85], '1Y':[0.9,1.02,0.92,0.93,1.07,0.93], '3Y':[1,1,1,1,1,1], '5Y':[1.1,0.98,1.08,1.07,0.94,1.08] };
+    const dec = [1,2,2,2,1,1];
+    const dir = ['max','min','max','max','min','max'];
+    const per = this.state.riskPeriod;
+    const fac = pf[per] || pf['3Y'];
+    const raw = riskList.map(([id]) => baseMatrix[id].map((v,c)=> v*fac[c]));
+    const colStats = [0,1,2,3,4,5].map(c=>{ const vs = raw.map(r=>r[c]); return { mn:Math.min.apply(null,vs), mx:Math.max.apply(null,vs) }; });
+    const heat = t => t>0.8?'#d6ecdc' : t>0.6?'#e7f3ea' : t>0.45?'#eef6ef' : t>0.3?'#f6efe9' : '#f0d3c6';
+    const riskRows = riskList.map(([id,short],ri)=>{
+      const last = ri === riskList.length-1;
+      const cells = raw[ri].map((v,c)=>{
+        const s = colStats[c]; let t = (s.mx===s.mn) ? 0.5 : (v - s.mn)/(s.mx - s.mn); if (dir[c]==='min') t = 1 - t;
+        const txt = (c===0 ? (v>=0?'+':'') + v.toFixed(dec[c]) : v.toFixed(dec[c]));
+        return { text: txt, style:{ padding:'11px 14px', textAlign:'right', background:heat(t), borderBottom: last?'none':'1px solid rgba(0,0,0,0.04)' } };
+      });
+      return { id, short, onOpen:()=>this.openFundById(id),
+        nameStyle:{ padding:'11px 14px', fontWeight:600, borderBottom: last?'none':'1px solid rgba(0,0,0,0.04)' }, cells };
+    });
+    const riskPeriodTabs = ['3M','6M','1Y','3Y','5Y'].map(p => ({ label:p, onClick:()=>this.setRiskPeriod(p), style:this.pillStyle(p===per) }));
+
+    // ---- portfolio switcher ----
+    const mine = this.state.portMode === 'mine';
+
+    // ---- Compare (dynamic columns) ----
+    const cmpIds = this.state.compareIds;
+    const cmpColors = ['#005FB8','#0f7b0f','#7c3aed','#d97706','#0891b2','#be185d'];
+    const pnum = v => parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
+    const cmpGrid = { display:'grid', gridTemplateColumns: '1.3fr ' + cmpIds.map(()=>'minmax(96px,1fr)').join(' '), fontVariantNumeric:'tabular-nums', minWidth: (200 + cmpIds.length*120) + 'px' };
+    const cmpCols = cmpIds.map((id,i)=>({
+      id, color: cmpColors[i % cmpColors.length],
+      short: (this.FUNDS[id].name.split(' \u00b7 ')[0]),
+      onOpen: ()=>this.openFundById(id),
+      removable: cmpIds.length > 2, onRemove: ()=>this.removeCompare(id) }));
+    const metricsDef = [
+      { key:'r5y', label:'5Y CAGR', dir:'max' },
+      { key:'sharpe', label:'Sharpe', dir:'max' },
+      { key:'sortino', label:'Sortino', dir:'max' },
+      { key:'alpha', label:'Alpha', dir:'max' },
+      { key:'beta', label:'Beta', dir:'none' },
+      { key:'std', label:'Std dev', dir:'min' },
+      { key:'expense', label:'Expense ratio', dir:'min' },
+    ];
+    const cmpFunds = cmpIds.map(id => this.FUNDS[id]);
+    const cmpRows = metricsDef.map((m, ri)=>{
+      const vals = cmpFunds.map(f => f[m.key]);
+      const nums = vals.map(pnum);
+      let best = -1;
+      if (m.dir === 'max') best = nums.indexOf(Math.max.apply(null, nums));
+      else if (m.dir === 'min') best = nums.indexOf(Math.min.apply(null, nums));
+      const lastRow = ri === metricsDef.length - 1;
+      const cells = vals.map((v,i)=>({
+        text: v,
+        style: { padding:'11px 18px', fontSize:'13px',
+          borderBottom: lastRow ? 'none' : '1px solid rgba(0,0,0,0.045)',
+          borderLeft:'1px solid rgba(0,0,0,0.05)',
+          color: i===best ? '#1a6a1a' : '#1a1a1a',
+          fontWeight: i===best ? 600 : 400,
+          background: i===best ? '#f1f8f1' : 'transparent' } }));
+      return { label:m.label, cells,
+        labelStyle:{ padding:'11px 18px', fontSize:'13px', color:'#5e5e5e', borderBottom: lastRow ? 'none' : '1px solid rgba(0,0,0,0.045)' } };
+    });
+    const cmpAddable = Object.keys(this.FUNDS).filter(id => cmpIds.indexOf(id) === -1)
+      .map(id => ({ id, name: this.FUNDS[id].name.split(' \u00b7 ')[0], cat: this.FUNDS[id].sub.split(' \u00b7 ')[0], onClick: ()=>this.addCompare(id) }));
+    // growth chart lines from each fund's 5Y
+    const cmpLines = cmpIds.map((id,i)=>{
+      const endY = Math.max(20, Math.min(168, 150 - (pnum(this.FUNDS[id].r5y) - 12) * 6));
+      const xs = [0,130,260,390,520,650,780];
+      const pts = xs.map((x,k)=>{ const t=k/(xs.length-1); const base=176+(endY-176)*t; const wob=Math.sin(i*1.3+k*1.05)*5; return x+','+Math.round(base+wob); });
+      return { points: pts.join(' '), color: cmpColors[i % cmpColors.length] };
+    });
+    const cmpLegend = cmpCols.map(c => ({ short:c.short, color:c.color }));
+    const cmpCanAdd = cmpAddable.length > 0;
+
+    // ---- Transactions: clickable filter tabs ----
+    const tf = this.state.txnFilter;
+    const txnCats = ['All','SIP','Lumpsum','Redemption','Equity (shares)'];
+    const txnCatActive = { background:'#eff6fc', border:'1px solid rgba(0,103,184,0.35)', color:'#005FB8', borderRadius:'14px', padding:'5px 13px', fontSize:'12.5px', fontWeight:600, cursor:'default', whiteSpace:'nowrap' };
+    const txnCatIdle = { background:'#fbfbfb', border:'1px solid rgba(0,0,0,0.09)', color:'#3a3a3a', borderRadius:'14px', padding:'5px 13px', fontSize:'12.5px', cursor:'default', whiteSpace:'nowrap' };
+    const catOf = r => (r.cat === 'Equity' ? 'Equity (shares)' : r.cat);
+    const txnFilterTabs = txnCats.map(cat => ({
+      label: cat, onClick: ()=>this.setTxnFilter(cat),
+      style: cat === tf ? txnCatActive : txnCatIdle }));
+    const txnVisible = this.TXNS.filter(r => tf === 'All' ? true : catOf(r) === tf);
+    const txnCount = txnVisible.length;
+    const txnHasRows = txnCount > 0;
+    const txnRows = txnVisible.map((r,i)=>{
+      const last = i === txnVisible.length - 1;
+      const bb = last ? 'none' : '1px solid rgba(0,0,0,0.04)';
+      return {
+        date: r.d, name: r.n, units: r.u, amount: r.a, badgeText: r.t,
+        dateStyle: { padding:'11px 18px', fontSize:'12.5px', color:'#3a3a3a', borderBottom:bb },
+        nameStyle: { padding:'11px 14px', fontSize:'12.5px', color:'#1a1a1a', borderBottom:bb },
+        typeCellStyle: { padding:'11px 14px', borderBottom:bb },
+        badgeStyle: { fontSize:'10px', color:r.c, border:'1px solid '+r.b, borderRadius:'10px', padding:'1px 7px' },
+        unitStyle: { padding:'11px 14px', fontSize:'12.5px', textAlign:'right', color:'#1a1a1a', borderBottom:bb },
+        amtStyle: { padding:'11px 18px', fontSize:'12.5px', textAlign:'right', color: r.neg ? '#c42b1c' : '#1a1a1a', borderBottom:bb } };
+    });
+
+    return { act, show, ...h,
+      fund: this.FUNDS[this.state.fund] || this.FUNDS.ppfas,
+      openFund: (e)=>this.openFund(e), openTax: ()=>this.go('tax'), openImport: ()=>this.go('import'),
+      openReturns: ()=>this.go('returns'), openRisk: ()=>this.go('risk'), openExplore: ()=>this.go('explore'),
+      chartLine, chartArea, axisLabels, rangeTabs,
+      rangeLabel: this.state.range, rangeDelta: cur.delta, rangeDeltaColor: cur.up ? '#0f7b0f' : '#c42b1c',
+      onChartHover: (e)=>this.onChartHover(e), clearHover: ()=>this.clearHover(),
+      hoverShow, hoverLeftPct, hoverDotTop, hoverVal, hoverLabel,
+      navFundPts, navBenchLine, navFundArea, navTabs, navRangeLabel: this.state.navRange,
+      portName: mine ? 'My portfolio' : 'Sample portfolio',
+      portDesc: mine ? 'no funds yet' : 'demo data',
+      portOpen: this.state.portOpen, onTogglePort: ()=>this.togglePort(),
+      onPickSample: ()=>this.pickPort('sample'), onPickMine: ()=>this.pickPort('mine'),
+      sampleActiveBg: mine ? 'transparent' : '#eaf3fb', mineActiveBg: mine ? '#eaf3fb' : 'transparent',
+      showDashSample: (s==='dashboard' && !mine), showDashEmpty: (s==='dashboard' && mine),
+      cmpGrid, cmpCols, cmpRows, cmpAddable, cmpLines, cmpLegend, cmpCanAdd,
+      addOpen: this.state.addOpen, onToggleAdd: ()=>this.toggleAdd(),
+      retTrailing: retView==='trailing', retRolling: retView==='rolling',
+      retTrailTab, retRollTab, onRetTrail: ()=>this.setRetView('trailing'), onRetRoll: ()=>this.setRetView('rolling'),
+      rollLine, rollTabs, rollWinLabel: rollCur.label, rollAvg: rollCur.avg, rollMax: rollCur.max, rollMin: rollCur.min, rollGt12: rollCur.gt12, rollNeg: rollCur.neg,
+      riskRows, riskPeriodTabs, riskPeriodLabel: per,
+      txnFilterTabs, txnRows, txnCount, txnHasRows };
+  }
+}
+</script>
+
+
+</body></html>
