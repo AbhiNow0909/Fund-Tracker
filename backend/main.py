@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from routers import analytics, explore, portfolio
+from routers import analytics, explore, portfolio, transactions
 from scheduler.daily_sync import start_scheduler
 
 settings = get_settings()
@@ -50,8 +50,4 @@ def health() -> dict[str, str]:
 app.include_router(portfolio.router)
 app.include_router(analytics.router)
 app.include_router(explore.router)
-
-# Routers added in later steps:
-#   from routers import tax, transactions
-#   app.include_router(tax.router)
-#   ...
+app.include_router(transactions.router)
