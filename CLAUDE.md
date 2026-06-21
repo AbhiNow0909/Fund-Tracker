@@ -1080,7 +1080,12 @@ Keep `.env.example` files for both, committed, with placeholder values only.
 
 ## 17. Current Status
 
-**Project phase:** Planning complete, implementation not yet started.
+**Project phase:** Implementation complete (Steps 1–18). Backend (FastAPI parsers,
+analytics engine with passing unit tests, NAV/LTP/benchmark pipeline + daily sync, and
+all routes) and frontend (all 10 screens + Settings + auth, Windows-11 design system,
+mock-data-driven) are built and build/test green. Remaining: user-side verification of
+the parsers against real eCAS PDFs, wiring live data fetching on the frontend, and
+production deployment (see DEPLOYMENT.md).
 
 **Decisions made and locked:**
 - This is a standalone project, separate from any other portfolio tracker
@@ -1095,8 +1100,9 @@ Keep `.env.example` files for both, committed, with placeholder values only.
 - Light, Windows-11-inspired design system, tokens to be extracted directly from the wireframe
 
 **Next immediate action:**
-Step 1 -- place the wireframe file, run the extraction script, and confirm all 10 screens are
-readable in `wireframe/extracted.html` before writing any application code.
+Verify the parsers against 2–3 real NSDL eCAS PDFs locally (`backend/scripts/verify_*`),
+then wire the frontend screens to the live API (React Query) in place of mock data, and
+deploy per DEPLOYMENT.md.
 
 **Not yet decided (decide when you reach that step):**
 - Exact NSDL alpha-quality issues, if any -- discover and document during Step 3
