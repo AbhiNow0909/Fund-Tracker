@@ -27,6 +27,12 @@ from services.supabase_client import get_supabase
 router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
 
+class DetectedItem(BaseModel):
+    name: str
+    value: float | None = None
+    qty: float | None = None
+
+
 class UploadResponse(BaseModel):
     upload_id: str
     mf_parsed: bool
@@ -34,6 +40,9 @@ class UploadResponse(BaseModel):
     mf_holdings_count: int
     mf_transactions_count: int
     equity_holdings_count: int
+    combined_value: float | None = None
+    detected_mf: list[DetectedItem] = []
+    detected_equity: list[DetectedItem] = []
     flagged: list[str] = []
 
 
@@ -68,6 +77,13 @@ async def upload_cas(
 
         upload_id = _persist(user_id, file.filename or "statement.pdf", parsed_mf, parsed_eq)
 
+        detected_mf = [DetectedItem(name=h.scheme_name, value=h.current_value) for h in parsed_mf.holdings]
+        detected_equity = [
+            DetectedItem(name=e.security_name, value=e.current_value, qty=e.quantity)
+            for e in parsed_eq.holdings
+        ]
+        combined = sum((d.value or 0) for d in detected_mf) + sum((d.value or 0) for d in detected_equity)
+
         return UploadResponse(
             upload_id=upload_id,
             mf_parsed=True,
@@ -75,6 +91,9 @@ async def upload_cas(
             mf_holdings_count=len(parsed_mf.holdings),
             mf_transactions_count=len(parsed_mf.transactions),
             equity_holdings_count=len(parsed_eq.holdings),
+            combined_value=combined or None,
+            detected_mf=detected_mf,
+            detected_equity=detected_equity,
             flagged=parsed_eq.flagged,
         )
     finally:
