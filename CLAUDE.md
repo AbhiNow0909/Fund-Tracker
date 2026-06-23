@@ -408,8 +408,18 @@ entirely. This is expected, not a bug -- that's what the custom extractor in 7.2
 > exchange) and auto-enriches symbol/exchange. Per the user's decision, the equity
 > extractor (`services/equity_extractor.py`) reads casparser's output instead of a
 > custom `pdfplumber` extractor — it's free, **local** (privacy promise preserved),
-> maintained, and avoids a second parsing pass. The `pdfplumber` approach below is
-> retained only as a fallback option if a future statement defeats casparser.
+> maintained, and avoids a second parsing pass.
+>
+> **However (verified against a real NSDL eCAS):** casparser 1.2.0 **mis-maps the
+> "Mutual Fund Folios" section** — current value lands in the `ucc` field, NAV
+> becomes 0, P&L shifts — so that section (often the bulk of the portfolio) parses
+> with wrong values. We therefore parse the MF Folios table directly from the PDF
+> text with `pdfplumber` in `cas_parser_mf.extract_nsdl_mf_folios()` (the row layout
+> `<ISIN> <name> <folio> <units> <avg> <total_cost> <nav> <value> <pnl>` is reliable),
+> enriching scheme name + AMFI from casparser by ISIN. casparser is still used for
+> equities, demat ETFs/REITs (`accounts[].mutual_funds`), and Sovereign Gold Bonds
+> (`accounts[].bonds`, only `value`/`name`/`isin` trusted). Verified end-to-end: the
+> parsed total reconciles to the statement's grand total to the rupee.
 > ISIN→sector enrichment uses a local static map (`services/isin_sectors.py`).
 > Note: an eCAS is a snapshot, so equities have no cost basis (avg price/invested
 > are filled later via broker import or manual entry).

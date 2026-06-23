@@ -88,6 +88,28 @@ def extract_equity_holdings(payload: dict[str, Any]) -> ParsedEquityData:
                 )
             )
 
+        # Bonds / Sovereign Gold Bonds — only `value`, `name`, `isin` are reliable
+        # from casparser; we surface them so the portfolio total reconciles.
+        for bond in account.get("bonds", []) or []:
+            isin = bond.get("isin")
+            name = bond.get("name") or "Bond"
+            if not isin:
+                continue
+            is_sgb = isin.startswith("IN00") or "GOVERNMENT" in name.upper()
+            holdings.append(
+                EquityHolding(
+                    isin=isin,
+                    ticker=isin,
+                    exchange="",
+                    security_name="Sovereign Gold Bond" if is_sgb else name,
+                    sector="Sovereign Gold Bond" if is_sgb else "Bond",
+                    quantity=None,
+                    ltp=None,
+                    current_value=_to_float(bond.get("value")),
+                    dp_id_masked=dp_masked,
+                )
+            )
+
     return ParsedEquityData(holdings=holdings, flagged=flagged)
 
 

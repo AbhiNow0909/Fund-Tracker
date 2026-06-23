@@ -13,6 +13,7 @@ import {
 import { TrailingReturnsTable } from "@/components/charts/TrailingReturnsTable";
 import { RollingReturnsChart } from "@/components/charts/RollingReturnsChart";
 import { ROLLING_DATA, ROLLING_WINDOWS, TRAILING_ROWS } from "@/lib/mockData";
+import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
 
 // Portfolio (avg of funds) vs benchmark CAGR across periods, for the bar chart.
 const PERIOD_IDX: [string, number][] = [["1Y", 4], ["3Y", 5], ["5Y", 6], ["10Y", 7]];
@@ -49,6 +50,7 @@ export default function ReturnsPage() {
         <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Returns Analyzer</h1>
         <p className="mt-0.5 text-[13px] text-ink-secondary">Trailing &amp; rolling returns vs benchmark</p>
       </div>
+      <SampleModeNotice feature="Returns analysis" />
 
       {/* view toggle */}
       <div className="mb-4 flex flex-wrap items-center gap-2.5">

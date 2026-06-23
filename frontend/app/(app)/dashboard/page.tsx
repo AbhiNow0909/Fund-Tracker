@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePortfolioMode } from "@/lib/portfolio-context";
 import { KpiCard } from "@/components/ui/KpiCard";
@@ -11,11 +12,132 @@ import {
   MF_HOLDINGS,
   PORTFOLIO_SUMMARY as P,
 } from "@/lib/mockData";
+import { getDashboard, type DashboardData } from "@/lib/api";
 import { formatINR, formatINRCompact, formatPct, gainColorClass } from "@/lib/formatters";
 
 export default function DashboardPage() {
   const { mode, setMode } = usePortfolioMode();
-  return mode === "mine" ? <EmptyDashboard onExplore={() => setMode("sample")} /> : <SampleDashboard />;
+  return mode === "mine" ? <MyDashboard onExplore={() => setMode("sample")} /> : <SampleDashboard />;
+}
+
+/* --------------------- My portfolio (live backend data) --------------------- */
+
+function MyDashboard({ onExplore }: { onExplore: () => void }) {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getDashboard()
+      .then((d) => active && setData(d))
+      .catch((e) => active && setError(e instanceof Error ? e.message : "Failed to load."))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <PageHead title="Dashboard" subtitle="My portfolio" />
+        <div className="rounded-card border border-black/[0.06] bg-card p-6 text-[13px] text-ink-secondary shadow-card">
+          Loading your portfolio…
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <PageHead title="Dashboard" subtitle="My portfolio" />
+        <div className="rounded-card border border-loss/30 bg-[#fdf6f4] p-6 text-[13px] text-loss shadow-card">
+          {error}
+        </div>
+      </>
+    );
+  }
+
+  if (!data || !data.has_holdings) return <EmptyDashboard onExplore={onExplore} />;
+
+  return (
+    <>
+      <PageHead title="Dashboard" subtitle="My portfolio" />
+
+      <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(168px,1fr))]">
+        <KpiCard
+          label="Current value"
+          value={formatINR(data.current_value)}
+          sub={`Funds ${formatINRCompact(data.mf_value)} · Shares ${formatINRCompact(data.equity_value)}`}
+        />
+        <KpiCard label="Invested" value={data.invested ? formatINR(data.invested) : "—"} sub="where cost basis known" />
+        <KpiCard
+          label="Total gain"
+          value={data.total_gain ? `${data.total_gain >= 0 ? "+" : ""}${formatINR(data.total_gain)}` : "—"}
+          valueClass={gainColorClass(data.total_gain)}
+          sub={data.total_gain_pct != null ? formatPct(data.total_gain_pct) : undefined}
+          subClass={gainColorClass(data.total_gain)}
+        />
+        <KpiCard label="Holdings" value={`${data.holdings_count}`} sub={`${data.mf_holdings.length} funds · ${data.equity_count} stocks`} />
+      </div>
+
+      {data.equity_count > 0 && data.invested === 0 && (
+        <div className="mb-4 rounded-nav border border-accent/20 bg-[#f6f9fd] px-3.5 py-2.5 text-[12.5px] text-ink-secondary">
+          Note: an eCAS snapshot has no purchase price for shares, so equity invested/gain can&apos;t be
+          computed. The value chart appears once daily price history is synced.
+        </div>
+      )}
+
+      <div className="overflow-hidden rounded-card border border-black/[0.06] bg-card shadow-card">
+        <div className="flex items-center justify-between px-5 pb-3 pt-4">
+          <span className="text-[16px] font-semibold text-ink">Mutual fund holdings</span>
+          <span className="text-[12px] text-ink-muted">{data.mf_holdings.length} funds</span>
+        </div>
+        <div className="grid grid-cols-[2.4fr_1fr_1fr_1fr_0.9fr] gap-2 border-b border-black/[0.06] bg-[#fbfbfb] px-5 py-2 text-[11.5px] font-semibold text-ink-muted">
+          <span>FUND</span>
+          <span className="text-right">NAV</span>
+          <span className="text-right">INVESTED</span>
+          <span className="text-right">CURRENT</span>
+          <span className="text-right">GAIN</span>
+        </div>
+        {data.mf_holdings.map((h) => (
+          <Link key={h.isin} href={`/fund/${h.isin}`} className="grid grid-cols-[2.4fr_1fr_1fr_1fr_0.9fr] tnum items-center gap-2 border-b border-black/[0.045] px-5 py-3 last:border-b-0 hover:bg-black/[0.025]">
+            <div>
+              <div className="text-[13.5px] font-semibold text-ink">{h.scheme_name}</div>
+              {h.category && <div className="text-[11.5px] text-ink-muted">{h.category}</div>}
+            </div>
+            <span className="text-right text-[13px] text-[#3a3a3a]">{h.current_nav != null ? `₹${h.current_nav.toFixed(2)}` : "—"}</span>
+            <span className="text-right text-[13px] text-[#3a3a3a]">{h.invested_value != null ? formatINR(h.invested_value) : "—"}</span>
+            <span className="text-right text-[13px] font-semibold text-ink">{h.current_value != null ? formatINR(h.current_value) : "—"}</span>
+            <span className={`text-right text-[13px] ${h.gain_pct != null ? gainColorClass(h.gain_pct) : "text-ink-muted"}`}>
+              {h.gain_pct != null ? formatPct(h.gain_pct) : "—"}
+            </span>
+          </Link>
+        ))}
+
+        {data.equity_count > 0 && (
+          <Link href="/stocks" className="flex items-center justify-between gap-2 border-t border-black/[0.06] bg-[#fbfbfb] px-5 py-3 hover:bg-black/[0.04]">
+            <div className="text-[13.5px] font-semibold text-ink">Direct equity · {data.equity_count} stocks</div>
+            <div className="tnum flex items-center gap-3.5">
+              <span className="text-[13px] font-semibold text-ink">{formatINR(data.equity_value)}</span>
+              <span className="text-[12px] font-semibold text-accent">View →</span>
+            </div>
+          </Link>
+        )}
+      </div>
+    </>
+  );
+}
+
+function PageHead({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="mb-4">
+      <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">{title}</h1>
+      <p className="mt-0.5 text-[13px] text-ink-secondary">{subtitle}</p>
+    </div>
+  );
 }
 
 /* ----------------------------- Empty state ----------------------------- */

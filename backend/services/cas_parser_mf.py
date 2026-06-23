@@ -16,6 +16,7 @@ which reads the same casparser output.
 """
 from __future__ import annotations
 
+import re
 from typing import Any, Optional
 
 from pydantic import BaseModel
@@ -208,9 +209,18 @@ def _normalize_cams(payload: dict[str, Any]) -> tuple[list[MFHolding], list[MFTr
 
 
 def _normalize_nsdl(payload: dict[str, Any]) -> list[MFHolding]:
+    """MF holdings held *inside the demat account* (ETFs/REITs/gold funds).
+
+    The separate "Mutual Fund Folios" section is intentionally SKIPPED here:
+    casparser mis-maps its NAV / value / P&L columns (value lands in `ucc`, NAV
+    becomes 0, etc.), so it is parsed instead by extract_nsdl_mf_folios() straight
+    from the PDF text, where the row layout is reliable.
+    """
     holdings: list[MFHolding] = []
 
     for account in payload.get("accounts", []) or []:
+        if "folio" in (account.get("type") or "").lower():
+            continue  # handled by extract_nsdl_mf_folios()
         for mf in account.get("mutual_funds", []) or []:
             isin = mf.get("isin")
             if not isin:
@@ -231,4 +241,71 @@ def _normalize_nsdl(payload: dict[str, Any]) -> list[MFHolding]:
                 )
             )
 
+    return holdings
+
+
+# <ISIN> <name fragment> <folio> <units> <avg> <total_cost> <nav> <value> <pnl>
+_FOLIO_ROW = re.compile(
+    r"^(IN[A-Z0-9]{10})\s+(.+?)\s+(\d{6,})\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+"
+    r"([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)\s+(-?[\d,]+\.\d+)$"
+)
+
+
+def _num(s: str) -> Optional[float]:
+    try:
+        return float(s.replace(",", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def extract_nsdl_mf_folios(file_path: str, password: str, payload: dict[str, Any]) -> list[MFHolding]:
+    """Parse the NSDL 'Mutual Fund Folios' table directly from the PDF text.
+
+    casparser scrambles this section's columns, so we read each row's reliable
+    `<ISIN> <name> <folio> <units> <avg> <total_cost> <nav> <value> <pnl>` line
+    ourselves. Scheme name + AMFI code are enriched from casparser's data by ISIN.
+    """
+    try:
+        import pdfplumber
+    except ImportError:  # pragma: no cover
+        return []
+
+    # ISIN -> {name, amfi, category} from casparser (full, clean names + AMFI).
+    meta: dict[str, dict[str, Any]] = {}
+    for account in payload.get("accounts", []) or []:
+        for mf in account.get("mutual_funds", []) or []:
+            isin = mf.get("isin")
+            if isin and isin not in meta:
+                meta[isin] = {"name": mf.get("name"), "amfi": mf.get("amfi"), "category": mf.get("type")}
+
+    try:
+        with pdfplumber.open(file_path, password=password or "") as pdf:
+            lines: list[str] = []
+            for page in pdf.pages:
+                lines += (page.extract_text() or "").split("\n")
+    except Exception:
+        return []
+
+    holdings: list[MFHolding] = []
+    for line in lines:
+        m = _FOLIO_ROW.match(line.strip())
+        if not m:
+            continue
+        isin, name_frag, folio, units, avg, total_cost, nav, value, _pnl = m.groups()
+        info = meta.get(isin, {})
+        holdings.append(
+            MFHolding(
+                isin=isin,
+                scheme_name=info.get("name") or name_frag.strip(),
+                amfi_code=info.get("amfi"),
+                folio_number=folio,
+                amc=None,
+                category=info.get("category"),
+                units_held=_num(units),
+                average_nav=_num(avg),
+                current_nav=_num(nav),
+                current_value=_num(value),
+                invested_value=_num(total_cost),
+            )
+        )
     return holdings

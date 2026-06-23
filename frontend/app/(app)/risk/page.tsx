@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { RiskMatrixTable } from "@/components/charts/RiskMatrixTable";
 import { RISK_PERIODS } from "@/lib/mockData";
+import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
 
 export default function RiskPage() {
   const [period, setPeriod] = useState<string>("3Y");
@@ -15,6 +16,7 @@ export default function RiskPage() {
           Risk-adjusted performance across every fund
         </p>
       </div>
+      <SampleModeNotice feature="Risk metrics" />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="rounded-pill border border-black/[0.09] bg-[#fbfbfb] px-3 py-1.5 text-[12.5px] text-ink">

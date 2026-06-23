@@ -8,6 +8,7 @@ import {
   type RealisedGain,
 } from "@/lib/mockData";
 import { formatINR } from "@/lib/formatters";
+import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
 
 export default function TaxPage() {
   const usedPct = Math.round((T.realisedLTCG / T.exemptionTotal) * 100);
@@ -23,6 +24,7 @@ export default function TaxPage() {
           Realised gains, harvesting &amp; estimated tax · FY {TAX_CONFIG.fy}
         </p>
       </div>
+      <SampleModeNotice feature="Tax tracking" />
 
       {/* KPI cards */}
       <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">

@@ -20,7 +20,13 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from pydantic import BaseModel
 
 from services.auth_middleware import get_current_user_id
-from services.cas_parser_mf import MFParseError, ParsedMFData, normalize_mf, read_cas_payload
+from services.cas_parser_mf import (
+    MFParseError,
+    ParsedMFData,
+    extract_nsdl_mf_folios,
+    normalize_mf,
+    read_cas_payload,
+)
 from services.equity_extractor import ParsedEquityData, extract_equity_holdings
 from services.supabase_client import get_supabase
 
@@ -75,6 +81,11 @@ async def upload_cas(
         parsed_mf = normalize_mf(payload)
         parsed_eq = extract_equity_holdings(payload)
 
+        # NSDL/CDSL: the "Mutual Fund Folios" table is parsed from the PDF text
+        # (casparser mis-maps its columns). Append those holdings.
+        if "accounts" in payload:
+            parsed_mf.holdings.extend(extract_nsdl_mf_folios(tmp_path, password, payload))
+
         upload_id = _persist(user_id, file.filename or "statement.pdf", parsed_mf, parsed_eq)
 
         detected_mf = [DetectedItem(name=h.scheme_name, value=h.current_value) for h in parsed_mf.holdings]
@@ -101,13 +112,200 @@ async def upload_cas(
             os.remove(tmp_path)
 
 
+class MFHoldingOut(BaseModel):
+    isin: str
+    scheme_name: str
+    category: str | None = None
+    current_nav: float | None = None
+    invested_value: float | None = None
+    current_value: float | None = None
+    gain_pct: float | None = None
+
+
+class DashboardResponse(BaseModel):
+    has_holdings: bool
+    current_value: float
+    invested: float
+    total_gain: float
+    total_gain_pct: float | None
+    mf_value: float
+    equity_value: float
+    holdings_count: int
+    mf_holdings: list[MFHoldingOut] = []
+    equity_value_total: float = 0.0
+    equity_count: int = 0
+
+
+def _f(v) -> float:
+    return float(v) if v is not None else 0.0
+
+
+@router.get("/dashboard", response_model=DashboardResponse)
+def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
+    """KPIs + MF holdings for the signed-in user, computed from stored holdings.
+
+    Gain is computed only over holdings that have a known cost basis (NSDL eCAS
+    equities carry no cost basis, so their gain is excluded — current value still
+    counts toward the portfolio total).
+    """
+    sb = get_supabase()
+    mf = (
+        sb.table("mf_holdings")
+        .select("isin, scheme_name, category, current_nav, invested_value, current_value")
+        .eq("user_id", user_id)
+        .execute()
+        .data
+        or []
+    )
+    eq = (
+        sb.table("equity_holdings")
+        .select("isin, current_value, invested_value")
+        .eq("user_id", user_id)
+        .execute()
+        .data
+        or []
+    )
+
+    mf_value = sum(_f(h.get("current_value")) for h in mf)
+    eq_value = sum(_f(h.get("current_value")) for h in eq)
+
+    # Gain only across holdings with a known invested amount.
+    cost_basis = 0.0
+    cost_basis_current = 0.0
+    for h in mf + eq:
+        inv = h.get("invested_value")
+        if inv:
+            cost_basis += _f(inv)
+            cost_basis_current += _f(h.get("current_value"))
+    total_gain = cost_basis_current - cost_basis
+    gain_pct = (total_gain / cost_basis * 100.0) if cost_basis else None
+
+    mf_out = []
+    for h in mf:
+        inv = h.get("invested_value")
+        cur = h.get("current_value")
+        pct = ((_f(cur) - _f(inv)) / _f(inv) * 100.0) if inv else None
+        mf_out.append(
+            MFHoldingOut(
+                isin=h["isin"],
+                scheme_name=h.get("scheme_name", "—"),
+                category=h.get("category"),
+                current_nav=h.get("current_nav"),
+                invested_value=h.get("invested_value"),
+                current_value=h.get("current_value"),
+                gain_pct=round(pct, 1) if pct is not None else None,
+            )
+        )
+
+    return DashboardResponse(
+        has_holdings=bool(mf or eq),
+        current_value=round(mf_value + eq_value, 2),
+        invested=round(cost_basis, 2),
+        total_gain=round(total_gain, 2),
+        total_gain_pct=round(gain_pct, 1) if gain_pct is not None else None,
+        mf_value=round(mf_value, 2),
+        equity_value=round(eq_value, 2),
+        holdings_count=len(mf) + len(eq),
+        mf_holdings=mf_out,
+        equity_value_total=round(eq_value, 2),
+        equity_count=len(eq),
+    )
+
+
+class NavPoint(BaseModel):
+    date: str
+    nav: float
+    bench: float | None = None
+
+
+class FundMetrics(BaseModel):
+    trailing_1y: float | None = None
+    trailing_3y: float | None = None
+    trailing_5y: float | None = None
+    trailing_10y: float | None = None
+    alpha: float | None = None
+    beta: float | None = None
+    sharpe_ratio: float | None = None
+    sortino_ratio: float | None = None
+    std_dev: float | None = None
+    treynor_ratio: float | None = None
+    max_drawdown: float | None = None
+
+
+class FundDetailOut(BaseModel):
+    isin: str
+    scheme_name: str
+    category: str | None = None
+    amc: str | None = None
+    amfi_code: str | None = None
+    folio_number: str | None = None
+    units_held: float | None = None
+    average_nav: float | None = None
+    current_nav: float | None = None
+    invested_value: float | None = None
+    current_value: float | None = None
+    gain_pct: float | None = None
+    nav_history: list[NavPoint] = []
+    metrics: FundMetrics | None = None
+
+
+@router.get("/fund/{isin}", response_model=FundDetailOut)
+def fund_detail(isin: str, user_id: str = Depends(get_current_user_id)) -> FundDetailOut:
+    from config import get_settings
+    from services import analytics_service as svc
+
+    sb = get_supabase()
+    rows = (
+        sb.table("mf_holdings")
+        .select("isin, scheme_name, category, amc, amfi_code, folio_number, units_held, average_nav, current_nav, invested_value, current_value")
+        .eq("user_id", user_id)
+        .eq("isin", isin)
+        .limit(1)
+        .execute()
+        .data
+        or []
+    )
+    if not rows:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fund not found.")
+    h = rows[0]
+    inv = h.get("invested_value")
+    pct = ((_f(h.get("current_value")) - _f(inv)) / _f(inv) * 100.0) if inv else None
+
+    # Live NAV history + metrics from MFApi (no need to wait for the daily sync).
+    points, metrics = svc.fund_chart_and_metrics(h.get("amfi_code"), get_settings().risk_free_rate)
+
+    return FundDetailOut(
+        isin=h["isin"],
+        scheme_name=h.get("scheme_name", "—"),
+        category=h.get("category"),
+        amc=h.get("amc"),
+        amfi_code=h.get("amfi_code"),
+        folio_number=h.get("folio_number"),
+        units_held=h.get("units_held"),
+        average_nav=h.get("average_nav"),
+        current_nav=h.get("current_nav"),
+        invested_value=h.get("invested_value"),
+        current_value=h.get("current_value"),
+        gain_pct=round(pct, 1) if pct is not None else None,
+        nav_history=[NavPoint(**p) for p in points],
+        metrics=FundMetrics(**metrics) if metrics else None,
+    )
+
+
 def _persist(
     user_id: str,
     filename: str,
     parsed_mf: ParsedMFData,
     parsed_eq: ParsedEquityData,
 ) -> str:
-    """Upsert MF + equity holdings and MF transactions; record the upload."""
+    """Replace the user's holdings + transactions with this statement's data.
+
+    A re-upload fully REPLACES the portfolio: we delete the user's existing
+    mf_holdings, equity_holdings and transactions first, then insert the freshly
+    parsed rows. (Upsert alone duplicates NSDL MF holdings whose folio is NULL,
+    because Postgres treats NULLs as distinct in the unique index — so totals grow
+    on every re-upload. A clean wipe-and-insert avoids that entirely.)
+    """
     supabase = get_supabase()
 
     upload = (
@@ -126,8 +324,13 @@ def _persist(
     )
     upload_id = upload.data[0]["id"]
 
+    # Full replace — clear existing rows for this user before inserting fresh.
+    supabase.table("mf_holdings").delete().eq("user_id", user_id).execute()
+    supabase.table("equity_holdings").delete().eq("user_id", user_id).execute()
+    supabase.table("transactions").delete().eq("user_id", user_id).execute()
+
     if parsed_mf.holdings:
-        supabase.table("mf_holdings").upsert(
+        supabase.table("mf_holdings").insert(
             [
                 {
                     "user_id": user_id,
@@ -144,12 +347,11 @@ def _persist(
                     "invested_value": h.invested_value,
                 }
                 for h in parsed_mf.holdings
-            ],
-            on_conflict="user_id,isin,folio_number",
+            ]
         ).execute()
 
     if parsed_eq.holdings:
-        supabase.table("equity_holdings").upsert(
+        supabase.table("equity_holdings").insert(
             [
                 {
                     "user_id": user_id,
@@ -166,14 +368,8 @@ def _persist(
                     "dp_id_masked": e.dp_id_masked,
                 }
                 for e in parsed_eq.holdings
-            ],
-            on_conflict="user_id,isin",
+            ]
         ).execute()
-
-    # Replace this user's MF transactions so re-uploads stay idempotent.
-    supabase.table("transactions").delete().eq("user_id", user_id).eq(
-        "asset_type", "mutual_fund"
-    ).execute()
 
     if parsed_mf.transactions:
         supabase.table("transactions").insert(

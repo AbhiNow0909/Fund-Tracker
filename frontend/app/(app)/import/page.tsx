@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { uploadCas, type UploadResult } from "@/lib/api";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { usePortfolioMode } from "@/lib/portfolio-context";
 import { formatINR, formatINRCompact } from "@/lib/formatters";
 
 const STEPS = ["Upload", "Read & map", "Review", "Import"];
 
 export default function ImportPage() {
   const router = useRouter();
+  const { setMode } = usePortfolioMode();
   const [file, setFile] = useState<File | null>(null);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -160,7 +162,13 @@ export default function ImportPage() {
           </div>
         </div>
       ) : (
-        <ReviewStage result={result!} onImport={() => router.push("/dashboard")} />
+        <ReviewStage
+          result={result!}
+          onImport={() => {
+            setMode("mine");
+            router.push("/dashboard");
+          }}
+        />
       )}
     </>
   );

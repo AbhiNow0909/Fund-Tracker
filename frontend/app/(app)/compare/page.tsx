@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { FUNDS } from "@/lib/mockData";
 import { CompareGrowthChart, type CompareLine } from "@/components/charts/CompareGrowthChart";
+import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
 
 const COLORS = ["#005FB8", "#0f7b0f", "#7c3aed", "#d97706", "#0891b2", "#be185d"];
 
@@ -49,6 +50,7 @@ export default function ComparePage() {
         <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Compare</h1>
         <p className="mt-0.5 text-[13px] text-ink-secondary">Side-by-side across returns, risk &amp; cost</p>
       </div>
+      <SampleModeNotice feature="Comparison" />
 
       {/* growth chart */}
       <div className="mb-4 rounded-card border border-black/[0.06] bg-card p-[18px] px-5 shadow-card">

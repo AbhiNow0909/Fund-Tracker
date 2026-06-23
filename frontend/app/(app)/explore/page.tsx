@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EXPLORE_CATEGORIES, EXPLORE_FUNDS, WATCHLIST, type ExploreRow } from "@/lib/mockData";
 import { formatPct, gainColorClass } from "@/lib/formatters";
+import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
 
 type SortKey = "name" | "fiveYear" | "sharpe";
 
@@ -51,6 +52,7 @@ export default function ExplorePage() {
         <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Explore funds</h1>
         <p className="mt-0.5 text-[13px] text-ink-secondary">Find and shortlist funds across AMCs</p>
       </div>
+      <SampleModeNotice feature="Fund discovery" />
 
       {/* watchlist */}
       <div className="mb-4 rounded-card border border-accent/20 bg-[#f6f9fd] p-4 px-[18px] shadow-card">

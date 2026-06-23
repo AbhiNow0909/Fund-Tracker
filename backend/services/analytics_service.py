@@ -138,6 +138,72 @@ def build_portfolio_value_series(sb: Any, user_id: str) -> pd.Series:
     return combined.sum(axis=1)
 
 
+def fund_chart_and_metrics(
+    amfi_code: Optional[str], risk_free_rate: float
+) -> tuple[list[dict], Optional[dict]]:
+    """Fetch a fund's NAV history live (MFApi) + Nifty 500 (Yahoo), compute the
+    chart series and full metric set. Returns ([] , None) if no history.
+
+    This powers the fund-detail screen without waiting for the daily sync.
+    """
+    from services.nav_fetcher import fetch_nav_history
+    from services.price_fetcher import get_benchmark_history
+
+    if not amfi_code:
+        return [], None
+    quotes = fetch_nav_history(amfi_code)
+    if not quotes:
+        return [], None
+
+    fund_s = pd.Series({pd.Timestamp(q.nav_date): q.nav for q in quotes}).sort_index()
+    bench_quotes = get_benchmark_history("nifty500_tri", "5y")
+    bench_s = (
+        pd.Series({pd.Timestamp(q.price_date): q.close_price for q in bench_quotes}).sort_index()
+        if bench_quotes
+        else pd.Series(dtype=float)
+    )
+
+    asset_returns = ae.daily_returns(fund_s)
+    alpha, beta = (None, None)
+    if len(bench_s) >= 2:
+        alpha, beta = ae.alpha_beta(asset_returns, ae.daily_returns(bench_s))
+
+    metrics = {
+        "trailing_1y": ae.trailing_return(fund_s, 365),
+        "trailing_3y": ae.trailing_return(fund_s, 1095),
+        "trailing_5y": ae.trailing_return(fund_s, 1825),
+        "trailing_10y": ae.trailing_return(fund_s, 3650),
+        "alpha": alpha,
+        "beta": beta,
+        "sharpe_ratio": ae.sharpe_ratio(asset_returns, risk_free_rate),
+        "sortino_ratio": ae.sortino_ratio(asset_returns, risk_free_rate),
+        "std_dev": ae.std_dev(asset_returns),
+        "treynor_ratio": ae.treynor_ratio(asset_returns, beta, risk_free_rate),
+        "max_drawdown": ae.max_drawdown(fund_s),
+    }
+
+    # Chart: last 5y, fund NAV + benchmark (forward-filled), downsampled.
+    cutoff = fund_s.index.max() - pd.Timedelta(days=5 * 365)
+    fchart = fund_s[fund_s.index >= cutoff]
+    if len(bench_s):
+        merged = pd.concat([fchart, bench_s], axis=1, keys=["nav", "bench"]).sort_index().ffill()
+        merged = merged[merged.index >= cutoff].dropna(subset=["nav"])
+    else:
+        merged = fchart.to_frame("nav")
+        merged["bench"] = None
+
+    step = max(1, len(merged) // 250)
+    points = [
+        {
+            "date": idx.date().isoformat(),
+            "nav": round(float(row["nav"]), 4),
+            "bench": round(float(row["bench"]), 4) if pd.notna(row.get("bench")) else None,
+        }
+        for idx, row in merged.iloc[::step].iterrows()
+    ]
+    return points, metrics
+
+
 def rolling_stats(rolling: pd.Series) -> dict[str, Optional[float]]:
     if rolling is None or len(rolling) == 0:
         return {"average": None, "maximum": None, "minimum": None, "pct_gt_12": None, "pct_negative": None}
