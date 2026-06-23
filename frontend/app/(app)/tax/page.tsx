@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { usePortfolioMode } from "@/lib/portfolio-context";
 import { KpiCard } from "@/components/ui/KpiCard";
 import {
   TAX_CONFIG,
@@ -7,10 +11,72 @@ import {
   UNREALISED_GAINS as U,
   type RealisedGain,
 } from "@/lib/mockData";
-import { formatINR } from "@/lib/formatters";
-import { SampleModeNotice } from "@/components/ui/SampleModeNotice";
+import { formatINR, gainColorClass } from "@/lib/formatters";
+import { getTaxSummary, type TaxSummaryData } from "@/lib/api";
 
 export default function TaxPage() {
+  const { mode } = usePortfolioMode();
+  return mode === "mine" ? <MyTax /> : <SampleTax />;
+}
+
+/* ----------------------------- My portfolio ----------------------------- */
+
+function MyTax() {
+  const [data, setData] = useState<TaxSummaryData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    getTaxSummary()
+      .then((d) => active && setData(d))
+      .catch((e) => active && setError(e instanceof Error ? e.message : "Failed to load."))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
+
+  return (
+    <>
+      <div className="mb-4">
+        <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Tax / Capital Gains</h1>
+        <p className="mt-0.5 text-[13px] text-ink-secondary">Unrealised gains · FY {data?.fy ?? TAX_CONFIG.fy}</p>
+      </div>
+
+      {loading && <div className="rounded-card border border-black/[0.06] bg-card p-6 text-[13px] text-ink-secondary shadow-card">Loading…</div>}
+      {error && <div className="rounded-card border border-loss/30 bg-[#fdf6f4] p-6 text-[13px] text-loss shadow-card">{error}</div>}
+
+      {data && (
+        <>
+          <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
+            <KpiCard
+              label="Unrealised gain"
+              value={`${data.unrealised_gain >= 0 ? "+" : ""}${formatINR(data.unrealised_gain)}`}
+              valueClass={gainColorClass(data.unrealised_gain)}
+              sub="where cost basis known"
+            />
+            <KpiCard label="— Mutual funds" value={`${data.unrealised_mf >= 0 ? "+" : ""}${formatINR(data.unrealised_mf)}`} valueClass={gainColorClass(data.unrealised_mf)} />
+            <KpiCard label="— Direct equity" value={`${data.unrealised_equity >= 0 ? "+" : ""}${formatINR(data.unrealised_equity)}`} valueClass={gainColorClass(data.unrealised_equity)} />
+            <KpiCard label="Invested (w/ basis)" value={formatINR(data.invested_with_basis)} sub={`${data.holdings_with_basis} holdings`} />
+          </div>
+
+          {data.holdings_without_basis > 0 && (
+            <div className="mb-4 rounded-nav border border-accent/20 bg-[#f6f9fd] px-3.5 py-2.5 text-[12.5px] text-ink-secondary">
+              {data.holdings_without_basis} holding(s) have no cost basis in your eCAS (e.g. demat shares, SGB), so their gain isn&apos;t included above.
+            </div>
+          )}
+
+          <div className="rounded-card border border-black/[0.06] bg-card px-4 py-3 text-[12px] leading-[1.6] text-ink-secondary">
+            <b>Realised gains &amp; LTCG/STCG not available.</b> {data.note}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+/* ------------------------------- Sample (mock) ------------------------------- */
+
+function SampleTax() {
   const usedPct = Math.round((T.realisedLTCG / T.exemptionTotal) * 100);
   const eqLTCG = sum(TAX_EQUITY_GAINS.filter((g) => g.gainType === "LTCG"));
   const eqSTCG = sum(TAX_EQUITY_GAINS.filter((g) => g.gainType === "STCG"));
@@ -24,7 +90,6 @@ export default function TaxPage() {
           Realised gains, harvesting &amp; estimated tax · FY {TAX_CONFIG.fy}
         </p>
       </div>
-      <SampleModeNotice feature="Tax tracking" />
 
       {/* KPI cards */}
       <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">

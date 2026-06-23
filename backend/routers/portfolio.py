@@ -52,6 +52,78 @@ class UploadResponse(BaseModel):
     flagged: list[str] = []
 
 
+class RefreshPricesResponse(BaseModel):
+    nav_points: int
+    price_points: int
+    benchmark_points: int
+    funds_synced: int
+    stocks_synced: int
+
+
+@router.post("/refresh-prices", response_model=RefreshPricesResponse)
+def refresh_prices(user_id: str = Depends(get_current_user_id)) -> RefreshPricesResponse:
+    """One-time backfill of historical NAV/price into the DB so the analytics
+    screens (Returns, Risk) can compute from the user's real holdings.
+
+    MF NAV history from MFApi (by AMFI code), equity price history from Yahoo,
+    plus the Nifty 50 / Nifty 500 benchmarks. Safe to re-run (upserts).
+    """
+    from services.nav_fetcher import fetch_nav_history
+    from services.price_fetcher import get_benchmark_history, get_price_history
+
+    sb = get_supabase()
+    nav_points = price_points = bench_points = funds = stocks = 0
+
+    mf = sb.table("mf_holdings").select("isin, amfi_code").eq("user_id", user_id).execute().data or []
+    seen: set[str] = set()
+    for h in mf:
+        isin, amfi = h["isin"], h.get("amfi_code")
+        if not amfi or isin in seen:
+            continue
+        seen.add(isin)
+        quotes = fetch_nav_history(amfi, limit=1600)  # ~6y daily
+        if quotes:
+            sb.table("nav_history").upsert(
+                [{"isin": isin, "amfi_code": amfi, "nav_date": q.nav_date, "nav": q.nav} for q in quotes],
+                on_conflict="isin,nav_date",
+            ).execute()
+            nav_points += len(quotes)
+            funds += 1
+
+    eq = sb.table("equity_holdings").select("isin, ticker, exchange").eq("user_id", user_id).execute().data or []
+    seen.clear()
+    for h in eq:
+        isin, ticker = h["isin"], h.get("ticker")
+        if not ticker or isin in seen or ticker == isin:  # skip bonds/SGB (ticker==isin)
+            continue
+        seen.add(isin)
+        quotes, _ = get_price_history(ticker, h.get("exchange") or "NSE", "5y")
+        if quotes:
+            sb.table("price_history").upsert(
+                [{"isin": isin, "ticker": ticker, "price_date": q.price_date, "close_price": q.close_price} for q in quotes],
+                on_conflict="isin,price_date",
+            ).execute()
+            price_points += len(quotes)
+            stocks += 1
+
+    for index_name in ("nifty50_tri", "nifty500_tri"):
+        bq = get_benchmark_history(index_name, "5y")
+        if bq:
+            sb.table("benchmark_history").upsert(
+                [{"index_name": index_name, "price_date": q.price_date, "close_price": q.close_price} for q in bq],
+                on_conflict="index_name,price_date",
+            ).execute()
+            bench_points += len(bq)
+
+    return RefreshPricesResponse(
+        nav_points=nav_points,
+        price_points=price_points,
+        benchmark_points=bench_points,
+        funds_synced=funds,
+        stocks_synced=stocks,
+    )
+
+
 @router.post("/upload", response_model=UploadResponse)
 async def upload_cas(
     file: UploadFile = File(...),

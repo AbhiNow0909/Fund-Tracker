@@ -182,3 +182,102 @@ export async function getTransactions(type = "all"): Promise<TransactionOut[]> {
   );
   return data.transactions;
 }
+
+async function postJson<T>(path: string): Promise<T> {
+  const headers = await authHeader();
+  const res = await fetch(`${API_URL}${path}`, { method: "POST", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Request failed: ${path}`);
+  }
+  return res.json();
+}
+
+// ---- One-time price backfill (enables Returns/Risk for the real portfolio) ----
+
+export interface RefreshResult {
+  nav_points: number;
+  price_points: number;
+  benchmark_points: number;
+  funds_synced: number;
+  stocks_synced: number;
+}
+
+export function refreshPrices(): Promise<RefreshResult> {
+  return postJson<RefreshResult>("/portfolio/refresh-prices");
+}
+
+// ---- Returns analyzer ----
+
+export interface TrailingRow {
+  name: string;
+  asset_type?: string;
+  trailing_1d: number | null;
+  trailing_1w: number | null;
+  trailing_1m: number | null;
+  trailing_6m: number | null;
+  trailing_1y: number | null;
+  trailing_3y: number | null;
+  trailing_5y: number | null;
+  trailing_10y: number | null;
+}
+
+export interface TrailingReturnsData {
+  columns: string[];
+  rows: TrailingRow[];
+  benchmark: TrailingRow & { name: string };
+}
+
+export function getTrailingReturns(): Promise<TrailingReturnsData> {
+  return getJson<TrailingReturnsData>("/analytics/trailing-returns");
+}
+
+export interface RollingData {
+  window: string;
+  series: { date: string; value: number }[];
+  stats: {
+    average: number | null;
+    maximum: number | null;
+    minimum: number | null;
+    pct_gt_12: number | null;
+    pct_negative: number | null;
+  };
+}
+
+export function getRollingReturns(window: string): Promise<RollingData> {
+  return getJson<RollingData>(`/analytics/rolling-returns?window=${window}`);
+}
+
+// ---- Risk matrix ----
+
+export interface RiskRow {
+  name: string;
+  alpha: number | null;
+  beta: number | null;
+  sharpe: number | null;
+  sortino: number | null;
+  std_dev: number | null;
+  max_drawdown: number | null;
+}
+
+export function getRiskMatrix(): Promise<{ rows: RiskRow[]; synced: boolean }> {
+  return getJson<{ rows: RiskRow[]; synced: boolean }>("/analytics/risk-matrix");
+}
+
+// ---- Tax summary ----
+
+export interface TaxSummaryData {
+  unrealised_gain: number;
+  unrealised_mf: number;
+  unrealised_equity: number;
+  invested_with_basis: number;
+  holdings_with_basis: number;
+  holdings_without_basis: number;
+  realised_available: boolean;
+  fy: string;
+  note: string;
+}
+
+export function getTaxSummary(): Promise<TaxSummaryData> {
+  return getJson<TaxSummaryData>("/tax/summary");
+}

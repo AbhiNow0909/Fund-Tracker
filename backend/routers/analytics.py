@@ -150,6 +150,46 @@ def compare(
     return {"items": results}
 
 
+@router.get("/risk-matrix")
+def risk_matrix(user_id: str = Depends(get_current_user_id)) -> dict:
+    """Per-holding risk metrics (alpha/beta/sharpe/sortino/std/maxdd) from synced
+    history. Rows with no history yet are omitted."""
+    sb = get_supabase()
+    settings = get_settings()
+    benchmark = svc.load_benchmark_series(sb, "nifty500_tri")
+
+    rows = []
+    mf = sb.table("mf_holdings").select("isin, scheme_name").eq("user_id", user_id).execute().data or []
+    eq = sb.table("equity_holdings").select("isin, security_name").eq("user_id", user_id).execute().data or []
+    for h in mf:
+        series = svc.load_nav_series(sb, h["isin"])
+        row = _risk_row(h.get("scheme_name"), series, benchmark, settings.risk_free_rate)
+        if row:
+            rows.append(row)
+    for h in eq:
+        series = svc.load_price_series(sb, h["isin"])
+        row = _risk_row(h.get("security_name"), series, benchmark, settings.risk_free_rate)
+        if row:
+            rows.append(row)
+    return {"rows": rows, "synced": bool(rows)}
+
+
+def _risk_row(name, series, benchmark, rf):
+    if len(series) < 30:  # not enough history
+        return None
+    ar = svc.ae.daily_returns(series)
+    alpha, beta = svc.ae.alpha_beta(ar, svc.ae.daily_returns(benchmark))
+    return {
+        "name": name,
+        "alpha": alpha,
+        "beta": beta,
+        "sharpe": svc.ae.sharpe_ratio(ar, rf),
+        "sortino": svc.ae.sortino_ratio(ar, rf),
+        "std_dev": svc.ae.std_dev(ar),
+        "max_drawdown": svc.ae.max_drawdown(series),
+    }
+
+
 @router.get("/{asset_type}/{isin}", response_model=AssetMetrics)
 def asset_metrics(
     asset_type: str,

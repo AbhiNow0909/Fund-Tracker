@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from routers import analytics, equity, explore, portfolio, transactions
+from routers import analytics, equity, explore, portfolio, tax, transactions
 from scheduler.daily_sync import start_scheduler
 
 settings = get_settings()
@@ -51,4 +51,5 @@ app.include_router(portfolio.router)
 app.include_router(equity.router)
 app.include_router(analytics.router)
 app.include_router(explore.router)
+app.include_router(tax.router)
 app.include_router(transactions.router)
