@@ -476,6 +476,14 @@ NSE's published equity master list.
 | Stock LTP (current + historical) | Yahoo Finance chart API via `httpx`, ticker + `.NS` | Fallback to `.BO`. (Revised at Step 5: `yfinance` dropped — current releases fail to parse Yahoo; the raw chart endpoint is reliable. Same data source.) |
 | Benchmark (Nifty 50 TRI, Nifty 500 TRI) | Yahoo Finance via `httpx` (`^NSEI`, `^CRSLDX`) | Price-index proxy for TRI — free TRI series unavailable; swap in a real TRI source if exact alpha/beta vs TRI is needed |
 
+**Source resolution for a holding's history (added Step "live analytics"):** when a
+MF holding has no stored AMFI code, resolve it (1) by ISIN from AMFI's NAVAll.txt
+(`nav_fetcher.resolve_amfi_by_isin`, covers schemes + most ETFs), then (2) by name
+via MFApi search. If still unpriceable (listed REITs/InvITs/ETFs not in AMFI, e.g.
+MINDSPACE), fall back to (3) Yahoo symbol search → NSE/BSE price history
+(`price_fetcher.get_history_by_query`). Resolved AMFI codes are persisted back to
+`mf_holdings.amfi_code`. Stocks already use Yahoo `.NS`/`.BO` by ticker.
+
 ### 7.4 Unified analytics inputs
 
 Both mutual funds and equities feed the **same analytics engine** (Section 9) -- the formulas

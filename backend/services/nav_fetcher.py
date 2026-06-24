@@ -109,6 +109,65 @@ def fetch_latest_nav_by_isin_amfi(isin: str) -> Optional[NavQuote]:
     return None
 
 
+_amfi_isin_map: Optional[dict[str, str]] = None
+
+
+def _load_amfi_isin_map() -> dict[str, str]:
+    """ISIN -> AMFI scheme code, parsed from AMFI's NAVAll.txt (cached per process)."""
+    global _amfi_isin_map
+    if _amfi_isin_map is not None:
+        return _amfi_isin_map
+    mapping: dict[str, str] = {}
+    try:
+        with httpx.Client(timeout=_TIMEOUT, follow_redirects=True) as client:
+            resp = client.get(AMFI_NAVALL_URL)
+            resp.raise_for_status()
+            text = resp.text
+    except httpx.HTTPError:
+        return {}
+    for line in text.splitlines():
+        parts = line.split(";")
+        if len(parts) < 6:
+            continue
+        code = parts[0].strip()
+        if not code.isdigit():
+            continue
+        for isin in (parts[1].strip().upper(), parts[2].strip().upper()):
+            if isin and isin != "-":
+                mapping[isin] = code
+    _amfi_isin_map = mapping
+    return mapping
+
+
+def resolve_amfi_by_isin(isin: Optional[str]) -> Optional[str]:
+    """Look up the AMFI scheme code for an ISIN (covers MF schemes and ETFs)."""
+    if not isin:
+        return None
+    return _load_amfi_isin_map().get(isin.strip().upper())
+
+
+def resolve_amfi_by_name(name: Optional[str]) -> Optional[str]:
+    """Fallback: resolve an AMFI scheme code by fuzzy name via MFApi search."""
+    if not name:
+        return None
+    try:
+        with httpx.Client(timeout=_TIMEOUT, follow_redirects=True) as client:
+            resp = client.get("https://api.mfapi.in/mf/search", params={"q": name[:48]})
+            resp.raise_for_status()
+            results = resp.json()
+    except (httpx.HTTPError, ValueError):
+        return None
+    if results and isinstance(results, list):
+        code = results[0].get("schemeCode")
+        return str(code) if code else None
+    return None
+
+
+def resolve_amfi(isin: Optional[str], name: Optional[str]) -> Optional[str]:
+    """Best-effort AMFI scheme code: ISIN lookup first, then name search."""
+    return resolve_amfi_by_isin(isin) or resolve_amfi_by_name(name)
+
+
 def get_latest_nav(amfi_code: Optional[str], isin: Optional[str]) -> Optional[NavQuote]:
     """Latest NAV with fallback: MFApi (by AMFI code) → AMFI dump (by ISIN)."""
     if amfi_code:

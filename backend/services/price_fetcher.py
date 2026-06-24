@@ -92,6 +92,35 @@ def get_latest_price(ticker: str, exchange: str = "NSE") -> Optional[PriceQuote]
     return quotes[-1] if quotes else None
 
 
+YAHOO_SEARCH = "https://query1.finance.yahoo.com/v1/finance/search"
+
+
+def yahoo_search_symbol(query: str) -> Optional[str]:
+    """Resolve a tradeable Yahoo symbol (preferring NSE `.NS`, then BSE `.BO`)
+    for a name or ISIN — used to price listed REITs/InvITs/ETFs that aren't AMFI
+    schemes. Returns e.g. 'MINDSPACE.NS'."""
+    if not query:
+        return None
+    try:
+        with httpx.Client(timeout=_TIMEOUT, follow_redirects=True, headers=_HEADERS) as client:
+            resp = client.get(YAHOO_SEARCH, params={"q": query, "quotesCount": 8, "newsCount": 0})
+            resp.raise_for_status()
+            quotes = (resp.json() or {}).get("quotes") or []
+    except (httpx.HTTPError, ValueError):
+        return None
+    ns = [q.get("symbol") for q in quotes if str(q.get("symbol", "")).endswith(".NS")]
+    bo = [q.get("symbol") for q in quotes if str(q.get("symbol", "")).endswith(".BO")]
+    return (ns or bo or [None])[0]
+
+
+def get_history_by_query(query: str, period: str = "5y") -> tuple[list[PriceQuote], Optional[str]]:
+    """Search for a symbol then fetch its history. Returns (quotes, symbol)."""
+    symbol = yahoo_search_symbol(query)
+    if not symbol:
+        return [], None
+    return _fetch_chart(symbol, period), symbol
+
+
 def get_benchmark_history(index_name: str, period: str = "5y") -> list[PriceQuote]:
     """Daily close history for a benchmark index."""
     symbol = BENCHMARK_SYMBOLS.get(index_name)

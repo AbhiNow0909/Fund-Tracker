@@ -139,23 +139,35 @@ def build_portfolio_value_series(sb: Any, user_id: str) -> pd.Series:
 
 
 def fund_chart_and_metrics(
-    amfi_code: Optional[str], risk_free_rate: float
+    amfi_code: Optional[str],
+    risk_free_rate: float,
+    isin: Optional[str] = None,
+    name: Optional[str] = None,
 ) -> tuple[list[dict], Optional[dict]]:
-    """Fetch a fund's NAV history live (MFApi) + Nifty 500 (Yahoo), compute the
-    chart series and full metric set. Returns ([] , None) if no history.
+    """Fetch a fund's price history + Nifty 500, compute chart + full metric set.
 
-    This powers the fund-detail screen without waiting for the daily sync.
+    Source resolution (so funds without a stored AMFI code still work):
+      1. stored AMFI code -> MFApi
+      2. resolve AMFI by ISIN/name -> MFApi
+      3. Yahoo symbol search by name/ISIN -> NSE/BSE history (REITs/InvITs/ETFs)
+
+    Returns ([], None) if no history can be found.
     """
-    from services.nav_fetcher import fetch_nav_history
-    from services.price_fetcher import get_benchmark_history
+    from services.nav_fetcher import fetch_nav_history, resolve_amfi
+    from services.price_fetcher import get_benchmark_history, get_history_by_query
 
-    if not amfi_code:
+    fund_s = pd.Series(dtype=float)
+    code = amfi_code or resolve_amfi(isin, name)
+    if code:
+        quotes = fetch_nav_history(code, limit=1600)
+        if quotes:
+            fund_s = pd.Series({pd.Timestamp(q.nav_date): q.nav for q in quotes}).sort_index()
+    if len(fund_s) == 0 and (name or isin):
+        pquotes, _ = get_history_by_query(name or isin or "", "5y")
+        if pquotes:
+            fund_s = pd.Series({pd.Timestamp(q.price_date): q.close_price for q in pquotes}).sort_index()
+    if len(fund_s) < 2:
         return [], None
-    quotes = fetch_nav_history(amfi_code)
-    if not quotes:
-        return [], None
-
-    fund_s = pd.Series({pd.Timestamp(q.nav_date): q.nav for q in quotes}).sort_index()
     bench_quotes = get_benchmark_history("nifty500_tri", "5y")
     bench_s = (
         pd.Series({pd.Timestamp(q.price_date): q.close_price for q in bench_quotes}).sort_index()

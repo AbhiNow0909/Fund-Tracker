@@ -68,26 +68,45 @@ def refresh_prices(user_id: str = Depends(get_current_user_id)) -> RefreshPrices
     MF NAV history from MFApi (by AMFI code), equity price history from Yahoo,
     plus the Nifty 50 / Nifty 500 benchmarks. Safe to re-run (upserts).
     """
-    from services.nav_fetcher import fetch_nav_history
-    from services.price_fetcher import get_benchmark_history, get_price_history
+    from services.nav_fetcher import fetch_nav_history, resolve_amfi
+    from services.price_fetcher import get_benchmark_history, get_history_by_query, get_price_history
 
     sb = get_supabase()
     nav_points = price_points = bench_points = funds = stocks = 0
 
-    mf = sb.table("mf_holdings").select("isin, amfi_code").eq("user_id", user_id).execute().data or []
+    mf = sb.table("mf_holdings").select("isin, amfi_code, scheme_name").eq("user_id", user_id).execute().data or []
     seen: set[str] = set()
     for h in mf:
-        isin, amfi = h["isin"], h.get("amfi_code")
-        if not amfi or isin in seen:
+        isin, name = h["isin"], h.get("scheme_name")
+        amfi = h.get("amfi_code")
+        if isin in seen:
             continue
         seen.add(isin)
-        quotes = fetch_nav_history(amfi, limit=1600)  # ~6y daily
+
+        # Resolve a missing AMFI code (by ISIN, then name) and persist it.
+        if not amfi:
+            amfi = resolve_amfi(isin, name)
+            if amfi:
+                sb.table("mf_holdings").update({"amfi_code": amfi}).eq("user_id", user_id).eq("isin", isin).execute()
+
+        quotes = fetch_nav_history(amfi, limit=1600) if amfi else []
         if quotes:
             sb.table("nav_history").upsert(
                 [{"isin": isin, "amfi_code": amfi, "nav_date": q.nav_date, "nav": q.nav} for q in quotes],
                 on_conflict="isin,nav_date",
             ).execute()
             nav_points += len(quotes)
+            funds += 1
+            continue
+
+        # No AMFI / no NAV — listed REIT/InvIT/ETF: price it via Yahoo (NSE/BSE).
+        pq, _sym = get_history_by_query(name or isin, "5y")
+        if pq:
+            sb.table("nav_history").upsert(
+                [{"isin": isin, "amfi_code": None, "nav_date": q.price_date, "nav": q.close_price} for q in pq],
+                on_conflict="isin,nav_date",
+            ).execute()
+            nav_points += len(pq)
             funds += 1
 
     eq = sb.table("equity_holdings").select("isin, ticker, exchange").eq("user_id", user_id).execute().data or []
@@ -343,8 +362,13 @@ def fund_detail(isin: str, user_id: str = Depends(get_current_user_id)) -> FundD
     inv = h.get("invested_value")
     pct = ((_f(h.get("current_value")) - _f(inv)) / _f(inv) * 100.0) if inv else None
 
-    # Live NAV history + metrics from MFApi (no need to wait for the daily sync).
-    points, metrics = svc.fund_chart_and_metrics(h.get("amfi_code"), get_settings().risk_free_rate)
+    # Live NAV history + metrics (resolves AMFI by ISIN/name, Yahoo fallback).
+    points, metrics = svc.fund_chart_and_metrics(
+        h.get("amfi_code"),
+        get_settings().risk_free_rate,
+        isin=h["isin"],
+        name=h.get("scheme_name"),
+    )
 
     return FundDetailOut(
         isin=h["isin"],
