@@ -69,6 +69,7 @@ export interface DashboardData {
   equity_gain: number;
   equity_gain_pct: number | null;
   holdings_count: number;
+  last_updated: string | null;
   mf_holdings: MFHoldingOut[];
   equity_value_total: number;
   equity_count: number;
@@ -211,6 +212,17 @@ export interface RefreshResult {
 
 export function refreshPrices(): Promise<RefreshResult> {
   return postJson<RefreshResult>("/portfolio/refresh-prices");
+}
+
+export interface RefreshHoldingsResult {
+  refreshed_at: string;
+  mf_updated: number;
+  equity_updated: number;
+}
+
+/** Re-price holdings with the latest NAV/LTP (fast — latest quote only). */
+export function refreshHoldings(): Promise<RefreshHoldingsResult> {
+  return postJson<RefreshHoldingsResult>("/portfolio/refresh-holdings");
 }
 
 // ---- Returns analyzer ----

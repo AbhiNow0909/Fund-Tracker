@@ -12,7 +12,7 @@ import {
   MF_HOLDINGS,
   PORTFOLIO_SUMMARY as P,
 } from "@/lib/mockData";
-import { getDashboard, type DashboardData } from "@/lib/api";
+import { getDashboard, refreshHoldings, type DashboardData } from "@/lib/api";
 import { formatINR, formatINRCompact, formatPct, gainColorClass } from "@/lib/formatters";
 
 export default function DashboardPage() {
@@ -26,17 +26,31 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+
+  const load = () =>
+    getDashboard()
+      .then(setData)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load."))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
-    let active = true;
-    getDashboard()
-      .then((d) => active && setData(d))
-      .catch((e) => active && setError(e instanceof Error ? e.message : "Failed to load."))
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
+    load();
   }, []);
+
+  async function refresh() {
+    setRefreshing(true);
+    setRefreshError(null);
+    try {
+      await refreshHoldings();
+      await load();
+    } catch (e) {
+      setRefreshError(e instanceof Error ? e.message : "Refresh failed.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -64,7 +78,27 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
 
   return (
     <>
-      <PageHead title="Dashboard" subtitle="My portfolio" />
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Dashboard</h1>
+          <p className="mt-0.5 text-[13px] text-ink-secondary">My portfolio</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-[12px] text-ink-muted">{formatUpdated(data.last_updated)}</span>
+          <button
+            onClick={refresh}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 rounded-pill border border-black/[0.09] bg-[#fbfbfb] px-3 py-1.5 text-[13px] font-semibold text-ink shadow-[0_1px_1px_rgba(0,0,0,0.03)] hover:bg-[#f4f4f4] disabled:opacity-50"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" className={refreshing ? "animate-spin" : ""}>
+              <path d="M13 5 A6 6 0 1 0 13.5 9" />
+              <polyline points="13 1.5 13 5 9.5 5" />
+            </svg>
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
+      </div>
+      {refreshError && <p className="mb-3 text-[12.5px] text-loss">{refreshError}</p>}
 
       <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         <KpiCard
@@ -131,6 +165,23 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
         )}
       </div>
     </>
+  );
+}
+
+function formatUpdated(iso: string | null): string {
+  if (!iso) return "Not refreshed yet";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "Not refreshed yet";
+  return (
+    "Updated " +
+    d.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
   );
 }
 

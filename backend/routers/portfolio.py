@@ -229,6 +229,7 @@ class DashboardResponse(BaseModel):
     equity_gain: float
     equity_gain_pct: float | None
     holdings_count: int
+    last_updated: str | None = None
     mf_holdings: list[MFHoldingOut] = []
     equity_value_total: float = 0.0
     equity_count: int = 0
@@ -249,7 +250,7 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
     sb = get_supabase()
     mf = (
         sb.table("mf_holdings")
-        .select("isin, scheme_name, category, current_nav, invested_value, current_value")
+        .select("isin, scheme_name, category, current_nav, invested_value, current_value, last_updated")
         .eq("user_id", user_id)
         .execute()
         .data
@@ -257,12 +258,14 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
     )
     eq = (
         sb.table("equity_holdings")
-        .select("isin, current_value, invested_value")
+        .select("isin, current_value, invested_value, last_updated")
         .eq("user_id", user_id)
         .execute()
         .data
         or []
     )
+    updates = [h.get("last_updated") for h in mf + eq if h.get("last_updated")]
+    last_updated = max(updates) if updates else None
 
     mf_value = sum(_f(h.get("current_value")) for h in mf)
     eq_value = sum(_f(h.get("current_value")) for h in eq)
@@ -318,10 +321,82 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
         equity_gain=round(eq_gain, 2),
         equity_gain_pct=round(eq_gain_pct, 1) if eq_gain_pct is not None else None,
         holdings_count=len(mf) + len(eq),
+        last_updated=last_updated,
         mf_holdings=mf_out,
         equity_value_total=round(eq_value, 2),
         equity_count=len(eq),
     )
+
+
+class RefreshHoldingsResponse(BaseModel):
+    refreshed_at: str
+    mf_updated: int
+    equity_updated: int
+
+
+@router.post("/refresh-holdings", response_model=RefreshHoldingsResponse)
+def refresh_holdings(user_id: str = Depends(get_current_user_id)) -> RefreshHoldingsResponse:
+    """Re-price the user's holdings with the latest NAV/LTP and update current
+    value + last_updated. Fast (latest quote only), unlike /refresh-prices which
+    backfills full history."""
+    from datetime import datetime, timezone
+
+    from services.nav_fetcher import get_latest_nav, resolve_amfi
+    from services.price_fetcher import get_history_by_query, get_latest_price
+
+    sb = get_supabase()
+    now = datetime.now(timezone.utc).isoformat()
+    mf_updated = equity_updated = 0
+
+    mf = (
+        sb.table("mf_holdings")
+        .select("id, isin, amfi_code, scheme_name, units_held")
+        .eq("user_id", user_id)
+        .execute()
+        .data
+        or []
+    )
+    for h in mf:
+        amfi = h.get("amfi_code") or resolve_amfi(h["isin"], h.get("scheme_name"))
+        nav = None
+        if amfi:
+            quote = get_latest_nav(amfi, h["isin"])
+            nav = quote.nav if quote else None
+        if nav is None:  # listed REIT/InvIT/ETF — latest price via Yahoo
+            pq, _ = get_history_by_query(h.get("scheme_name") or h["isin"], "5d")
+            nav = pq[-1].close_price if pq else None
+        if nav is None:
+            continue
+        patch: dict = {"current_nav": nav, "last_updated": now}
+        units = h.get("units_held")
+        if units is not None:
+            patch["current_value"] = round(float(units) * nav, 2)
+        sb.table("mf_holdings").update(patch).eq("id", h["id"]).execute()
+        mf_updated += 1
+
+    eq = (
+        sb.table("equity_holdings")
+        .select("id, isin, ticker, exchange, quantity")
+        .eq("user_id", user_id)
+        .execute()
+        .data
+        or []
+    )
+    for h in eq:
+        ticker = h.get("ticker")
+        if not ticker or ticker == h["isin"]:  # skip bonds/SGB (no ticker)
+            continue
+        quote = get_latest_price(ticker, h.get("exchange") or "NSE")
+        if not quote:
+            continue
+        patch = {"ltp": quote.close_price, "last_updated": now}
+        qty = h.get("quantity")
+        if qty is not None:
+            patch["current_value"] = round(float(qty) * quote.close_price, 2)
+        sb.table("equity_holdings").update(patch).eq("id", h["id"]).execute()
+        equity_updated += 1
+
+    return RefreshHoldingsResponse(refreshed_at=now, mf_updated=mf_updated, equity_updated=equity_updated)
 
 
 class NavPoint(BaseModel):
