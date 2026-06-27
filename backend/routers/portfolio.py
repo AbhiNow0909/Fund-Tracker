@@ -221,6 +221,13 @@ class DashboardResponse(BaseModel):
     total_gain_pct: float | None
     mf_value: float
     equity_value: float
+    # per-asset-class invested + gain (over holdings with a known cost basis)
+    mf_invested: float
+    mf_gain: float
+    mf_gain_pct: float | None
+    equity_invested: float
+    equity_gain: float
+    equity_gain_pct: float | None
     holdings_count: int
     mf_holdings: list[MFHoldingOut] = []
     equity_value_total: float = 0.0
@@ -260,15 +267,23 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
     mf_value = sum(_f(h.get("current_value")) for h in mf)
     eq_value = sum(_f(h.get("current_value")) for h in eq)
 
-    # Gain only across holdings with a known invested amount.
-    cost_basis = 0.0
-    cost_basis_current = 0.0
-    for h in mf + eq:
-        inv = h.get("invested_value")
-        if inv:
-            cost_basis += _f(inv)
-            cost_basis_current += _f(h.get("current_value"))
-    total_gain = cost_basis_current - cost_basis
+    # Invested + gain per asset class, over holdings with a known cost basis.
+    def _invested_gain(rows) -> tuple[float, float, float | None]:
+        invested = 0.0
+        current = 0.0
+        for h in rows:
+            inv = h.get("invested_value")
+            if inv:
+                invested += _f(inv)
+                current += _f(h.get("current_value"))
+        gain = current - invested
+        pct = (gain / invested * 100.0) if invested else None
+        return invested, gain, pct
+
+    mf_invested, mf_gain, mf_gain_pct = _invested_gain(mf)
+    eq_invested, eq_gain, eq_gain_pct = _invested_gain(eq)
+    cost_basis = mf_invested + eq_invested
+    total_gain = mf_gain + eq_gain
     gain_pct = (total_gain / cost_basis * 100.0) if cost_basis else None
 
     mf_out = []
@@ -296,6 +311,12 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
         total_gain_pct=round(gain_pct, 1) if gain_pct is not None else None,
         mf_value=round(mf_value, 2),
         equity_value=round(eq_value, 2),
+        mf_invested=round(mf_invested, 2),
+        mf_gain=round(mf_gain, 2),
+        mf_gain_pct=round(mf_gain_pct, 1) if mf_gain_pct is not None else None,
+        equity_invested=round(eq_invested, 2),
+        equity_gain=round(eq_gain, 2),
+        equity_gain_pct=round(eq_gain_pct, 1) if eq_gain_pct is not None else None,
         holdings_count=len(mf) + len(eq),
         mf_holdings=mf_out,
         equity_value_total=round(eq_value, 2),

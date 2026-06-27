@@ -66,21 +66,24 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
     <>
       <PageHead title="Dashboard" subtitle="My portfolio" />
 
-      <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(168px,1fr))]">
+      <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         <KpiCard
           label="Current value"
           value={formatINR(data.current_value)}
           sub={`Funds ${formatINRCompact(data.mf_value)} · Shares ${formatINRCompact(data.equity_value)}`}
         />
-        <KpiCard label="Invested" value={data.invested ? formatINR(data.invested) : "—"} sub="where cost basis known" />
-        <KpiCard
-          label="Total gain"
-          value={data.total_gain ? `${data.total_gain >= 0 ? "+" : ""}${formatINR(data.total_gain)}` : "—"}
-          valueClass={gainColorClass(data.total_gain)}
-          sub={data.total_gain_pct != null ? formatPct(data.total_gain_pct) : undefined}
-          subClass={gainColorClass(data.total_gain)}
+        <AssetClassCard
+          title="Mutual Funds"
+          invested={data.mf_invested}
+          gain={data.mf_gain}
+          gainPct={data.mf_gain_pct}
         />
-        <KpiCard label="Holdings" value={`${data.holdings_count}`} sub={`${data.mf_holdings.length} funds · ${data.equity_count} stocks`} />
+        <EquityValueCard
+          currentValue={data.equity_value}
+          count={data.equity_count}
+          gain={data.equity_gain}
+          gainPct={data.equity_gain_pct}
+        />
       </div>
 
       {data.equity_count > 0 && data.invested === 0 && (
@@ -136,6 +139,94 @@ function PageHead({ title, subtitle }: { title: string; subtitle: string }) {
     <div className="mb-4">
       <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">{title}</h1>
       <p className="mt-0.5 text-[13px] text-ink-secondary">{subtitle}</p>
+    </div>
+  );
+}
+
+/**
+ * Equity box: an NSDL eCAS has no purchase price for shares, so we show what the
+ * statement does carry — current value + holdings count (gain shown only if a
+ * cost basis becomes available, e.g. via broker import).
+ */
+function EquityValueCard({
+  currentValue,
+  count,
+  gain,
+  gainPct,
+}: {
+  currentValue: number;
+  count: number;
+  gain: number;
+  gainPct: number | null;
+}) {
+  const hasGain = gain !== 0 && gainPct != null;
+  return (
+    <div className="rounded-card border border-black/[0.06] bg-card p-4 px-[18px] shadow-card">
+      <div className="text-[12.5px] font-semibold text-ink-secondary">Equity Shares</div>
+      <div className="mt-2.5 flex flex-col gap-2">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11.5px] text-ink-muted">Current value</span>
+          <span className="tnum text-[17px] font-semibold text-ink">{formatINR(currentValue)}</span>
+        </div>
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11.5px] text-ink-muted">{hasGain ? "Total gain" : "Holdings"}</span>
+          <span className={`tnum text-[17px] font-semibold ${hasGain ? gainColorClass(gain) : "text-ink"}`}>
+            {hasGain ? (
+              <>
+                {gain >= 0 ? "+" : ""}
+                {formatINR(gain)}
+                {gainPct != null && <span className="ml-1 text-[12px] font-semibold">({formatPct(gainPct)})</span>}
+              </>
+            ) : (
+              `${count} scrips`
+            )}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Dashboard box: total invested + total gain for one asset class. */
+function AssetClassCard({
+  title,
+  invested,
+  gain,
+  gainPct,
+}: {
+  title: string;
+  invested: number;
+  gain: number;
+  gainPct: number | null;
+}) {
+  const hasBasis = invested > 0;
+  return (
+    <div className="rounded-card border border-black/[0.06] bg-card p-4 px-[18px] shadow-card">
+      <div className="text-[12.5px] font-semibold text-ink-secondary">{title}</div>
+      <div className="mt-2.5 flex flex-col gap-2">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11.5px] text-ink-muted">Total invested</span>
+          <span className="tnum text-[17px] font-semibold text-ink">
+            {hasBasis ? formatINR(invested) : "—"}
+          </span>
+        </div>
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11.5px] text-ink-muted">Total gain</span>
+          <span className={`tnum text-[17px] font-semibold ${hasBasis ? gainColorClass(gain) : "text-ink-muted"}`}>
+            {hasBasis ? (
+              <>
+                {gain >= 0 ? "+" : ""}
+                {formatINR(gain)}
+                {gainPct != null && (
+                  <span className="ml-1 text-[12px] font-semibold">({formatPct(gainPct)})</span>
+                )}
+              </>
+            ) : (
+              "—"
+            )}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

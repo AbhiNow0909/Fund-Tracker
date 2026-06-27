@@ -62,6 +62,12 @@ export interface DashboardData {
   total_gain_pct: number | null;
   mf_value: number;
   equity_value: number;
+  mf_invested: number;
+  mf_gain: number;
+  mf_gain_pct: number | null;
+  equity_invested: number;
+  equity_gain: number;
+  equity_gain_pct: number | null;
   holdings_count: number;
   mf_holdings: MFHoldingOut[];
   equity_value_total: number;
