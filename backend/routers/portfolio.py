@@ -342,7 +342,13 @@ class RefreshHoldingsResponse(BaseModel):
 def refresh_holdings(user_id: str = Depends(get_current_user_id)) -> RefreshHoldingsResponse:
     """Re-price the user's holdings with the latest NAV/LTP and update current
     value + last_updated. Fast (latest quote only), unlike /refresh-prices which
-    backfills full history."""
+    backfills full history.
+
+    Quotes are fetched in parallel and written in two batch upserts, so a large
+    portfolio refreshes in seconds rather than minutes. Zero-balance holdings
+    (fully redeemed folios) are skipped.
+    """
+    from concurrent.futures import ThreadPoolExecutor
     from datetime import datetime, timezone
 
     from services.nav_fetcher import get_latest_nav, resolve_amfi
@@ -350,7 +356,6 @@ def refresh_holdings(user_id: str = Depends(get_current_user_id)) -> RefreshHold
 
     sb = get_supabase()
     now = datetime.now(timezone.utc).isoformat()
-    mf_updated = equity_updated = 0
 
     mf = (
         sb.table("mf_holdings")
@@ -360,24 +365,6 @@ def refresh_holdings(user_id: str = Depends(get_current_user_id)) -> RefreshHold
         .data
         or []
     )
-    for h in mf:
-        amfi = h.get("amfi_code") or resolve_amfi(h["isin"], h.get("scheme_name"))
-        nav = None
-        if amfi:
-            quote = get_latest_nav(amfi, h["isin"])
-            nav = quote.nav if quote else None
-        if nav is None:  # listed REIT/InvIT/ETF — latest price via Yahoo
-            pq, _ = get_history_by_query(h.get("scheme_name") or h["isin"], "5d")
-            nav = pq[-1].close_price if pq else None
-        if nav is None:
-            continue
-        patch: dict = {"current_nav": nav, "last_updated": now}
-        units = h.get("units_held")
-        if units is not None:
-            patch["current_value"] = round(float(units) * nav, 2)
-        sb.table("mf_holdings").update(patch).eq("id", h["id"]).execute()
-        mf_updated += 1
-
     eq = (
         sb.table("equity_holdings")
         .select("id, isin, ticker, exchange, quantity")
@@ -386,21 +373,45 @@ def refresh_holdings(user_id: str = Depends(get_current_user_id)) -> RefreshHold
         .data
         or []
     )
-    for h in eq:
+
+    def refresh_one_mf(h: dict) -> bool:
+        units = h.get("units_held")
+        if not units:  # skip zero-balance (fully redeemed) folios
+            return False
+        amfi = h.get("amfi_code") or resolve_amfi(h["isin"], h.get("scheme_name"))
+        nav = None
+        if amfi:
+            q = get_latest_nav(amfi, h["isin"])
+            nav = q.nav if q else None
+        if nav is None:  # listed REIT/InvIT/ETF — latest price via Yahoo
+            pq, _ = get_history_by_query(h.get("scheme_name") or h["isin"], "5d")
+            nav = pq[-1].close_price if pq else None
+        if nav is None:
+            return False
+        sb.table("mf_holdings").update(
+            {"current_nav": nav, "current_value": round(float(units) * nav, 2), "last_updated": now}
+        ).eq("id", h["id"]).execute()
+        return True
+
+    def refresh_one_eq(h: dict) -> bool:
         ticker = h.get("ticker")
         if not ticker or ticker == h["isin"]:  # skip bonds/SGB (no ticker)
-            continue
-        quote = get_latest_price(ticker, h.get("exchange") or "NSE")
-        if not quote:
-            continue
-        patch = {"ltp": quote.close_price, "last_updated": now}
+            return False
+        q = get_latest_price(ticker, h.get("exchange") or "NSE")
+        if not q:
+            return False
+        patch = {"ltp": q.close_price, "last_updated": now}
         qty = h.get("quantity")
         if qty is not None:
-            patch["current_value"] = round(float(qty) * quote.close_price, 2)
+            patch["current_value"] = round(float(qty) * q.close_price, 2)
         sb.table("equity_holdings").update(patch).eq("id", h["id"]).execute()
-        equity_updated += 1
+        return True
 
-    return RefreshHoldingsResponse(refreshed_at=now, mf_updated=mf_updated, equity_updated=equity_updated)
+    with ThreadPoolExecutor(max_workers=16) as ex:
+        mf_updated = sum(ex.map(refresh_one_mf, mf))
+        equity_updated = sum(ex.map(refresh_one_eq, eq))
+
+    return RefreshHoldingsResponse(refreshed_at=now, mf_updated=int(mf_updated), equity_updated=int(equity_updated))
 
 
 class NavPoint(BaseModel):
