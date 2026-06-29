@@ -544,8 +544,14 @@ def _persist(
     upload_id = upload.data[0]["id"]
 
     # Mutual funds: replace when the statement reports MF holdings.
+    # A CAMS/KFin statement carries only AMC folios (folio_number set), so it must
+    # NOT delete demat ETFs/REITs (folio_number NULL) imported from an eCAS. A demat
+    # (NSDL/CDSL) statement re-provides both, so it fully replaces.
     if has_mf:
-        supabase.table("mf_holdings").delete().eq("user_id", user_id).execute()
+        mf_delete = supabase.table("mf_holdings").delete().eq("user_id", user_id)
+        if not is_demat:
+            mf_delete = mf_delete.filter("folio_number", "not.is", "null")
+        mf_delete.execute()
         supabase.table("transactions").delete().eq("user_id", user_id).eq("asset_type", "mutual_fund").execute()
 
     # Equities: replace ONLY for a demat statement (preserve eCAS shares otherwise).
