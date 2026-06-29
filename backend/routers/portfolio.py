@@ -271,6 +271,11 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
     updates = [h.get("last_updated") for h in mf + eq if h.get("last_updated")]
     last_updated = max(updates) if updates else None
 
+    # Hide fully-redeemed / zero-value holdings (e.g. closed folios from a detailed
+    # CAS, or a 0-share suspended scrip). "Active" = current value > 0.
+    mf = [h for h in mf if (h.get("current_value") or 0) > 0]
+    eq = [h for h in eq if (h.get("current_value") or 0) > 0]
+
     mf_value = sum(_f(h.get("current_value")) for h in mf)
     eq_value = sum(_f(h.get("current_value")) for h in eq)
 

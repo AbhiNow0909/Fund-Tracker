@@ -59,6 +59,8 @@ def equity_holdings(user_id: str = Depends(get_current_user_id)) -> EquityHoldin
         .data
         or []
     )
+    # Hide zero-value holdings (e.g. a 0-share suspended scrip).
+    rows = [r for r in rows if (r.get("current_value") or 0) > 0]
 
     current_value = sum(_f(r.get("current_value")) for r in rows)
     invested = sum(_f(r.get("invested_value")) for r in rows if r.get("invested_value"))

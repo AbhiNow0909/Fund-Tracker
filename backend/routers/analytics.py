@@ -100,8 +100,10 @@ def trailing_returns(user_id: str = Depends(get_current_user_id)) -> dict:
     benchmark = svc.load_benchmark_series(sb, "nifty500_tri")
 
     rows = []
-    mf = sb.table("mf_holdings").select("isin, scheme_name").eq("user_id", user_id).execute().data or []
-    eq = sb.table("equity_holdings").select("isin, security_name").eq("user_id", user_id).execute().data or []
+    mf = sb.table("mf_holdings").select("isin, scheme_name, current_value").eq("user_id", user_id).execute().data or []
+    eq = sb.table("equity_holdings").select("isin, security_name, current_value").eq("user_id", user_id).execute().data or []
+    mf = [h for h in mf if (h.get("current_value") or 0) > 0]
+    eq = [h for h in eq if (h.get("current_value") or 0) > 0]
     for h in mf:
         m = _compute_for(sb, user_id, "mutual_fund", h["isin"])
         rows.append({"name": h.get("scheme_name"), "asset_type": "mutual_fund", **_trailing_only(m)})
@@ -159,8 +161,10 @@ def risk_matrix(user_id: str = Depends(get_current_user_id)) -> dict:
     benchmark = svc.load_benchmark_series(sb, "nifty500_tri")
 
     rows = []
-    mf = sb.table("mf_holdings").select("isin, scheme_name").eq("user_id", user_id).execute().data or []
-    eq = sb.table("equity_holdings").select("isin, security_name").eq("user_id", user_id).execute().data or []
+    mf = sb.table("mf_holdings").select("isin, scheme_name, current_value").eq("user_id", user_id).execute().data or []
+    eq = sb.table("equity_holdings").select("isin, security_name, current_value").eq("user_id", user_id).execute().data or []
+    mf = [h for h in mf if (h.get("current_value") or 0) > 0]
+    eq = [h for h in eq if (h.get("current_value") or 0) > 0]
     for h in mf:
         series = svc.load_nav_series(sb, h["isin"])
         row = _risk_row(h.get("scheme_name"), series, benchmark, settings.risk_free_rate)
