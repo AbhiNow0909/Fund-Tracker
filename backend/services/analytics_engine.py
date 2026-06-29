@@ -141,7 +141,7 @@ def sharpe_ratio(returns: pd.Series, risk_free_rate: float = 0.065) -> Optional[
         return None
     excess = returns - risk_free_rate / TRADING_DAYS
     sd = excess.std(ddof=1)
-    if sd == 0 or math.isnan(sd):
+    if sd < 1e-9 or math.isnan(sd):  # near-zero variance: Sharpe is undefined
         return None
     return float(excess.mean() / sd * math.sqrt(TRADING_DAYS))
 
@@ -154,7 +154,7 @@ def sortino_ratio(returns: pd.Series, risk_free_rate: float = 0.065) -> Optional
     if len(downside) < 1:
         return None
     dd = downside.std(ddof=1)
-    if dd == 0 or math.isnan(dd):
+    if dd < 1e-9 or math.isnan(dd):  # near-zero downside deviation
         return None
     return float(excess.mean() / dd * math.sqrt(TRADING_DAYS))
 

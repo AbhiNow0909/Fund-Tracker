@@ -81,6 +81,11 @@ def test_sharpe_known_value():
     assert ae.sharpe_ratio(returns, risk_free_rate=0.0) == pytest.approx(expected, rel=1e-6)
 
 
+def test_sharpe_near_constant_returns_is_none():
+    # near-zero variance (float noise) must not produce an absurd Sharpe.
+    assert ae.sharpe_ratio(pd.Series([0.001, 0.001, 0.001])) is None
+
+
 def test_sortino_uses_downside_only():
     returns = pd.Series([0.02, -0.01, 0.03, -0.02])
     downside = returns[returns < 0]
