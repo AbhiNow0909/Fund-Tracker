@@ -172,12 +172,16 @@ async def upload_cas(
         parsed_mf = normalize_mf(payload)
         parsed_eq = extract_equity_holdings(payload)
 
+        # Only NSDL/CDSL statements have a demat section (equities). CAMS/KFin
+        # statements carry mutual funds only and must NOT touch equity holdings.
+        is_demat = "accounts" in payload
+
         # NSDL/CDSL: the "Mutual Fund Folios" table is parsed from the PDF text
         # (casparser mis-maps its columns). Append those holdings.
-        if "accounts" in payload:
+        if is_demat:
             parsed_mf.holdings.extend(extract_nsdl_mf_folios(tmp_path, password, payload))
 
-        upload_id = _persist(user_id, file.filename or "statement.pdf", parsed_mf, parsed_eq)
+        upload_id = _persist(user_id, file.filename or "statement.pdf", parsed_mf, parsed_eq, is_demat)
 
         detected_mf = [DetectedItem(name=h.scheme_name, value=h.current_value) for h in parsed_mf.holdings]
         detected_equity = [
@@ -188,8 +192,8 @@ async def upload_cas(
 
         return UploadResponse(
             upload_id=upload_id,
-            mf_parsed=True,
-            equity_parsed=True,
+            mf_parsed=bool(parsed_mf.holdings),
+            equity_parsed=is_demat,
             mf_holdings_count=len(parsed_mf.holdings),
             mf_transactions_count=len(parsed_mf.transactions),
             equity_holdings_count=len(parsed_eq.holdings),
@@ -489,16 +493,23 @@ def _persist(
     filename: str,
     parsed_mf: ParsedMFData,
     parsed_eq: ParsedEquityData,
+    is_demat: bool,
 ) -> str:
-    """Replace the user's holdings + transactions with this statement's data.
+    """Replace the user's data for the asset classes THIS statement reports.
 
-    A re-upload fully REPLACES the portfolio: we delete the user's existing
-    mf_holdings, equity_holdings and transactions first, then insert the freshly
-    parsed rows. (Upsert alone duplicates NSDL MF holdings whose folio is NULL,
-    because Postgres treats NULLs as distinct in the unique index — so totals grow
-    on every re-upload. A clean wipe-and-insert avoids that entirely.)
+    A statement replaces only what it carries, so different sources can coexist:
+      • MF holdings + MF transactions are replaced when the statement has MF data
+        (both CAMS/KFin and NSDL/CDSL).
+      • Equity holdings are replaced ONLY for a demat statement (NSDL/CDSL) — a
+        CAMS/KFin MF statement has no demat section, so it must leave equities
+        (imported earlier from an eCAS) untouched.
+
+    Replace = delete-then-insert (not upsert): NSDL MF holdings with a NULL folio
+    duplicate under upsert because Postgres treats NULLs as distinct in the unique
+    index, inflating totals on re-upload.
     """
     supabase = get_supabase()
+    has_mf = bool(parsed_mf.holdings)
 
     upload = (
         supabase.table("cas_uploads")
@@ -507,8 +518,8 @@ def _persist(
                 "user_id": user_id,
                 "storage_path": f"(ephemeral) {filename}",
                 "statement_date": parsed_mf.statement_period_to,
-                "parsed_mf": True,
-                "parsed_equity": True,
+                "parsed_mf": has_mf,
+                "parsed_equity": is_demat,
                 "status": "parsed",
             }
         )
@@ -516,10 +527,15 @@ def _persist(
     )
     upload_id = upload.data[0]["id"]
 
-    # Full replace — clear existing rows for this user before inserting fresh.
-    supabase.table("mf_holdings").delete().eq("user_id", user_id).execute()
-    supabase.table("equity_holdings").delete().eq("user_id", user_id).execute()
-    supabase.table("transactions").delete().eq("user_id", user_id).execute()
+    # Mutual funds: replace when the statement reports MF holdings.
+    if has_mf:
+        supabase.table("mf_holdings").delete().eq("user_id", user_id).execute()
+        supabase.table("transactions").delete().eq("user_id", user_id).eq("asset_type", "mutual_fund").execute()
+
+    # Equities: replace ONLY for a demat statement (preserve eCAS shares otherwise).
+    if is_demat:
+        supabase.table("equity_holdings").delete().eq("user_id", user_id).execute()
+        supabase.table("transactions").delete().eq("user_id", user_id).eq("asset_type", "equity").execute()
 
     if parsed_mf.holdings:
         supabase.table("mf_holdings").insert(
