@@ -295,18 +295,32 @@ export function getRiskMatrix(): Promise<{ rows: RiskRow[]; synced: boolean }> {
 
 // ---- Tax summary ----
 
+export interface RealisedRow {
+  name: string;
+  gain_type: "LTCG" | "STCG";
+  gain: number;
+  lots: number;
+}
+
 export interface TaxSummaryData {
+  fy: string;
+  available_fys: string[];
+  realised_available: boolean;
+  realised_ltcg: number;
+  realised_stcg: number;
+  ltcg_exemption: number;
+  exemption_left: number;
+  est_tax: number;
+  realised_rows: RealisedRow[];
+  unmatched_sells: number;
   unrealised_gain: number;
   unrealised_mf: number;
   unrealised_equity: number;
   invested_with_basis: number;
-  holdings_with_basis: number;
   holdings_without_basis: number;
-  realised_available: boolean;
-  fy: string;
   note: string;
 }
 
-export function getTaxSummary(): Promise<TaxSummaryData> {
-  return getJson<TaxSummaryData>("/tax/summary");
+export function getTaxSummary(fy?: string): Promise<TaxSummaryData> {
+  return getJson<TaxSummaryData>(`/tax/summary${fy ? `?fy=${encodeURIComponent(fy)}` : ""}`);
 }

@@ -24,16 +24,26 @@ _TYPE_FILTERS = {
 
 def _fetch(user_id: str, type_filter: str) -> list[dict]:
     sb = get_supabase()
-    q = (
-        sb.table("transactions")
-        .select("transaction_date, asset_type, isin, reference, transaction_type, quantity, amount")
-        .eq("user_id", user_id)
-        .order("transaction_date", desc=True)
-    )
     flt = _TYPE_FILTERS.get(type_filter)
-    if flt:
-        q = q.eq(flt[0], flt[1])
-    return q.execute().data or []
+    # Page past PostgREST's 1000-row cap so large histories aren't truncated.
+    rows: list[dict] = []
+    page, size = 0, 1000
+    while True:
+        q = (
+            sb.table("transactions")
+            .select("transaction_date, asset_type, isin, reference, transaction_type, quantity, amount")
+            .eq("user_id", user_id)
+            .order("transaction_date", desc=True)
+            .range(page * size, page * size + size - 1)
+        )
+        if flt:
+            q = q.eq(flt[0], flt[1])
+        batch = q.execute().data or []
+        rows.extend(batch)
+        if len(batch) < size:
+            break
+        page += 1
+    return rows
 
 
 @router.get("")

@@ -23,50 +23,146 @@ export default function TaxPage() {
 
 function MyTax() {
   const [data, setData] = useState<TaxSummaryData | null>(null);
+  const [fy, setFy] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
-    getTaxSummary()
+    setLoading(true);
+    getTaxSummary(fy)
       .then((d) => active && setData(d))
       .catch((e) => active && setError(e instanceof Error ? e.message : "Failed to load."))
       .finally(() => active && setLoading(false));
-    return () => { active = false; };
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [fy]);
+
+  const usedPct = data && data.ltcg_exemption ? Math.min(100, Math.round((Math.max(0, data.realised_ltcg) / data.ltcg_exemption) * 100)) : 0;
 
   return (
     <>
-      <div className="mb-4">
-        <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Tax / Capital Gains</h1>
-        <p className="mt-0.5 text-[13px] text-ink-secondary">Unrealised gains · FY {data?.fy ?? TAX_CONFIG.fy}</p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[28px] font-semibold tracking-[-0.01em] text-ink">Tax / Capital Gains</h1>
+          <p className="mt-0.5 text-[13px] text-ink-secondary">
+            Realised gains, harvesting &amp; estimated tax · FY {data?.fy ?? "—"}
+          </p>
+        </div>
+        {data && data.available_fys.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-[12.5px] text-ink-secondary">FY:</span>
+            <select
+              value={data.fy}
+              onChange={(e) => setFy(e.target.value)}
+              className="rounded-pill border border-black/[0.12] bg-[#fbfbfb] px-3 py-1.5 text-[12.5px] text-ink"
+            >
+              {data.available_fys.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {loading && <div className="rounded-card border border-black/[0.06] bg-card p-6 text-[13px] text-ink-secondary shadow-card">Loading…</div>}
       {error && <div className="rounded-card border border-loss/30 bg-[#fdf6f4] p-6 text-[13px] text-loss shadow-card">{error}</div>}
 
+      {data && !data.realised_available && !loading && (
+        <div className="mb-4 rounded-card border border-accent/20 bg-[#f6f9fd] px-4 py-3 text-[12.5px] leading-[1.6] text-ink-secondary">
+          No transaction history found, so realised gains can&apos;t be computed. Import a{" "}
+          <b>CAMS + KFintech detailed</b> statement to enable this. Unrealised gains are shown below.
+        </div>
+      )}
+
       {data && (
         <>
           <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
-            <KpiCard
-              label="Unrealised gain"
-              value={`${data.unrealised_gain >= 0 ? "+" : ""}${formatINR(data.unrealised_gain)}`}
-              valueClass={gainColorClass(data.unrealised_gain)}
-              sub="where cost basis known"
-            />
-            <KpiCard label="— Mutual funds" value={`${data.unrealised_mf >= 0 ? "+" : ""}${formatINR(data.unrealised_mf)}`} valueClass={gainColorClass(data.unrealised_mf)} />
-            <KpiCard label="— Direct equity" value={`${data.unrealised_equity >= 0 ? "+" : ""}${formatINR(data.unrealised_equity)}`} valueClass={gainColorClass(data.unrealised_equity)} />
-            <KpiCard label="Invested (w/ basis)" value={formatINR(data.invested_with_basis)} sub={`${data.holdings_with_basis} holdings`} />
+            <KpiCard label="Realised LTCG" value={formatINR(data.realised_ltcg)} valueClass={gainColorClass(data.realised_ltcg)} sub="equity · >12m" />
+            <KpiCard label="Realised STCG" value={formatINR(data.realised_stcg)} valueClass={gainColorClass(data.realised_stcg)} sub="equity · <12m" />
+            <KpiCard label="LTCG exemption left" value={formatINR(data.exemption_left)} valueClass="text-gain" sub={`of ${formatINR(data.ltcg_exemption)} / yr`} />
+            <KpiCard label="Est. tax payable" value={formatINR(data.est_tax)} sub={`FY ${data.fy}`} highlight />
           </div>
 
-          {data.holdings_without_basis > 0 && (
-            <div className="mb-4 rounded-nav border border-accent/20 bg-[#f6f9fd] px-3.5 py-2.5 text-[12.5px] text-ink-secondary">
-              {data.holdings_without_basis} holding(s) have no cost basis in your eCAS (e.g. demat shares, SGB), so their gain isn&apos;t included above.
+          <div className="grid items-start gap-4 [grid-template-columns:1.5fr_1fr]">
+            {/* realised gains table */}
+            <div className="overflow-hidden rounded-card border border-black/[0.06] bg-card shadow-card">
+              <div className="px-5 pb-3 pt-3.5 text-[16px] font-semibold text-ink">Realised gains · FY {data.fy}</div>
+              {data.realised_rows.length === 0 ? (
+                <div className="px-5 pb-5 text-[13px] text-ink-muted">No realised gains in this financial year.</div>
+              ) : (
+                <div className="grid grid-cols-[1.9fr_1.1fr_1fr] tnum">
+                  <Th>FUND</Th>
+                  <Th>TYPE</Th>
+                  <Th right>GAIN</Th>
+                  {data.realised_rows.map((r, i) => {
+                    const last = i === data.realised_rows.length - 1;
+                    const bb = last ? "" : "border-b border-black/[0.04]";
+                    const ltcg = r.gain_type === "LTCG";
+                    return (
+                      <div key={i} className="contents">
+                        <span className={`px-5 py-3 text-[13px] font-semibold text-ink ${bb}`}>{r.name}</span>
+                        <span className={`px-3.5 py-3 ${bb}`}>
+                          <span className={`rounded-[10px] border px-[7px] py-px text-[10px] ${ltcg ? "border-gain/40 text-gain" : "border-loss/40 text-loss"}`}>
+                            {r.gain_type} · {r.lots} lot{r.lots > 1 ? "s" : ""}
+                          </span>
+                        </span>
+                        <span className={`px-5 py-3 text-right text-[13px] ${gainColorClass(r.gain)} ${bb}`}>
+                          {r.gain >= 0 ? "+" : ""}
+                          {formatINR(r.gain)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* harvesting + unrealised */}
+            <div className="flex flex-col gap-4">
+              <div className="rounded-card border border-accent/20 bg-[#f6f9fd] p-[18px] px-5 shadow-card">
+                <div className="mb-2 text-[15px] font-semibold text-ink">LTCG exemption</div>
+                <div className="text-[12.5px] leading-[1.5] text-[#3a3a3a]">
+                  You&apos;ve realised <b>{formatINR(Math.max(0, data.realised_ltcg))}</b> of LTCG this FY against the{" "}
+                  <b>{formatINR(data.ltcg_exemption)}</b> tax-free limit. {data.exemption_left > 0 ? <>You can still harvest <b>{formatINR(data.exemption_left)}</b> tax-free.</> : <>The exemption is fully used.</>}
+                </div>
+                <div className="mt-3 h-[7px] overflow-hidden rounded-pill bg-[#dfe7ef]">
+                  <div className="h-full bg-accent" style={{ width: `${usedPct}%` }} />
+                </div>
+              </div>
+
+              <div className="rounded-card border border-black/[0.06] bg-card p-[18px] px-5 shadow-card">
+                <div className="mb-2.5 text-[15px] font-semibold text-ink">Unrealised gains</div>
+                <div className="tnum flex flex-col gap-2 text-[13px]">
+                  <div className="flex justify-between">
+                    <span className="text-ink-secondary">Mutual funds</span>
+                    <span className={`font-semibold ${gainColorClass(data.unrealised_mf)}`}>{formatINR(data.unrealised_mf)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-ink-secondary">Direct equity</span>
+                    <span className={`font-semibold ${gainColorClass(data.unrealised_equity)}`}>{formatINR(data.unrealised_equity)}</span>
+                  </div>
+                  {data.holdings_without_basis > 0 && (
+                    <div className="text-[11.5px] text-ink-faint">
+                      {data.holdings_without_basis} holding(s) have no cost basis (e.g. demat shares, SGB), excluded.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {data.unmatched_sells > 0 && (
+            <div className="mt-4 rounded-nav border border-accent/20 bg-[#f6f9fd] px-3.5 py-2.5 text-[12px] text-ink-secondary">
+              {data.unmatched_sells} sell(s) couldn&apos;t be matched to a purchase (buy history predates the statement) and were skipped.
             </div>
           )}
 
-          <div className="rounded-card border border-black/[0.06] bg-card px-4 py-3 text-[12px] leading-[1.6] text-ink-secondary">
-            <b>Realised gains &amp; LTCG/STCG not available.</b> {data.note}
+          <div className="mt-4 rounded-card border border-black/[0.06] bg-card px-4 py-3 text-[11.5px] leading-[1.6] text-ink-muted">
+            {data.note}
           </div>
         </>
       )}
