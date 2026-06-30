@@ -337,6 +337,24 @@ def dashboard(user_id: str = Depends(get_current_user_id)) -> DashboardResponse:
     )
 
 
+@router.get("/value-series")
+def value_series(user_id: str = Depends(get_current_user_id)) -> dict:
+    """Portfolio value over time (sum of each active holding's units × historical
+    price). Empty until prices have been synced (POST /portfolio/refresh-prices).
+    Downsampled to ~250 points."""
+    from services import analytics_service as svc
+
+    series = svc.build_portfolio_value_series(get_supabase(), user_id)
+    if len(series) == 0:
+        return {"series": []}
+    step = max(1, len(series) // 250)
+    points = [
+        {"date": idx.date().isoformat(), "value": round(float(v), 2)}
+        for idx, v in series.iloc[::step].items()
+    ]
+    return {"series": points}
+
+
 class RefreshHoldingsResponse(BaseModel):
     refreshed_at: str
     mf_updated: int

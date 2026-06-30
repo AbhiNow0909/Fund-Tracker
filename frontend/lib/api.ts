@@ -214,6 +214,17 @@ export function refreshPrices(): Promise<RefreshResult> {
   return postJson<RefreshResult>("/portfolio/refresh-prices");
 }
 
+export interface ValuePoint {
+  date: string;
+  value: number;
+}
+
+/** Portfolio value over time (empty until prices are synced). */
+export async function getValueSeries(): Promise<ValuePoint[]> {
+  const d = await getJson<{ series: ValuePoint[] }>("/portfolio/value-series");
+  return d.series;
+}
+
 export interface RefreshHoldingsResult {
   refreshed_at: string;
   mf_updated: number;

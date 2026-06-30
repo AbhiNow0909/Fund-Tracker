@@ -10,8 +10,14 @@ import { formatINR, formatPct, gainColorClass } from "@/lib/formatters";
 
 export default function FundDetailPage({ params }: { params: { id: string } }) {
   const mock = FUNDS[params.id];
-  if (mock) return <SampleFundDetail fund={mock} />;
-  return <RealFundDetail isin={params.id} />;
+  return (
+    <>
+      <Link href="/fund" className="mb-3 inline-flex items-center gap-1 text-[12.5px] font-semibold text-accent">
+        ← Back to funds
+      </Link>
+      {mock ? <SampleFundDetail fund={mock} /> : <RealFundDetail isin={params.id} />}
+    </>
+  );
 }
 
 function SampleFundDetail({ fund }: { fund: Fund }) {

@@ -12,7 +12,9 @@ import {
   MF_HOLDINGS,
   PORTFOLIO_SUMMARY as P,
 } from "@/lib/mockData";
-import { getDashboard, refreshHoldings, type DashboardData } from "@/lib/api";
+import { getDashboard, getValueSeries, refreshHoldings, type DashboardData, type ValuePoint } from "@/lib/api";
+import { RealPortfolioValueChart } from "@/components/charts/RealPortfolioValueChart";
+import { SyncPricesPanel } from "@/components/ui/SyncPricesPanel";
 import { formatINR, formatINRCompact, formatPct, gainColorClass } from "@/lib/formatters";
 
 export default function DashboardPage() {
@@ -24,14 +26,18 @@ export default function DashboardPage() {
 
 function MyDashboard({ onExplore }: { onExplore: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [valueSeries, setValueSeries] = useState<ValuePoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
 
   const load = () =>
-    getDashboard()
-      .then(setData)
+    Promise.all([getDashboard(), getValueSeries().catch(() => [])])
+      .then(([d, vs]) => {
+        setData(d);
+        setValueSeries(vs);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load."))
       .finally(() => setLoading(false));
 
@@ -120,52 +126,30 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
         />
       </div>
 
-      {data.equity_count > 0 && data.invested === 0 && (
-        <div className="mb-4 rounded-nav border border-accent/20 bg-[#f6f9fd] px-3.5 py-2.5 text-[12.5px] text-ink-secondary">
-          Note: an eCAS snapshot has no purchase price for shares, so equity invested/gain can&apos;t be
-          computed. The value chart appears once daily price history is synced.
-        </div>
-      )}
-
-      <div className="overflow-hidden rounded-card border border-black/[0.06] bg-card shadow-card">
-        <div className="flex items-center justify-between px-5 pb-3 pt-4">
-          <span className="text-[16px] font-semibold text-ink">Mutual fund holdings</span>
-          <span className="text-[12px] text-ink-muted">{data.mf_holdings.length} funds</span>
-        </div>
-        <div className="grid grid-cols-[2.4fr_1fr_1fr_1fr_0.9fr] gap-2 border-b border-black/[0.06] bg-[#fbfbfb] px-5 py-2 text-[11.5px] font-semibold text-ink-muted">
-          <span>FUND</span>
-          <span className="text-right">NAV</span>
-          <span className="text-right">INVESTED</span>
-          <span className="text-right">CURRENT</span>
-          <span className="text-right">GAIN</span>
-        </div>
-        {data.mf_holdings.map((h) => (
-          <Link key={h.isin} href={`/fund/${h.isin}`} className="grid grid-cols-[2.4fr_1fr_1fr_1fr_0.9fr] tnum items-center gap-2 border-b border-black/[0.045] px-5 py-3 last:border-b-0 hover:bg-black/[0.025]">
-            <div>
-              <div className="text-[13.5px] font-semibold text-ink">{h.scheme_name}</div>
-              {h.category && <div className="text-[11.5px] text-ink-muted">{h.category}</div>}
-            </div>
-            <span className="text-right text-[13px] text-[#3a3a3a]">{h.current_nav != null ? `₹${h.current_nav.toFixed(2)}` : "—"}</span>
-            <span className="text-right text-[13px] text-[#3a3a3a]">{h.invested_value != null ? formatINR(h.invested_value) : "—"}</span>
-            <span className="text-right text-[13px] font-semibold text-ink">{h.current_value != null ? formatINR(h.current_value) : "—"}</span>
-            <span className={`text-right text-[13px] ${h.gain_pct != null ? gainColorClass(h.gain_pct) : "text-ink-muted"}`}>
-              {h.gain_pct != null ? formatPct(h.gain_pct) : "—"}
-            </span>
-          </Link>
-        ))}
-
-        {data.equity_count > 0 && (
-          <Link href="/stocks" className="flex items-center justify-between gap-2 border-t border-black/[0.06] bg-[#fbfbfb] px-5 py-3 hover:bg-black/[0.04]">
-            <div className="text-[13.5px] font-semibold text-ink">Direct equity · {data.equity_count} stocks</div>
-            <div className="tnum flex items-center gap-3.5">
-              <span className="text-[13px] font-semibold text-ink">{formatINR(data.equity_value)}</span>
-              <span className="text-[12px] font-semibold text-accent">View →</span>
-            </div>
-          </Link>
+      <div className="grid items-start gap-4 [grid-template-columns:2fr_1fr]">
+        {valueSeries.length > 1 ? (
+          <RealPortfolioValueChart series={valueSeries} />
+        ) : (
+          <SyncPricesPanel onSynced={load} />
         )}
+        <AllocationDonut
+          title="Asset allocation"
+          subtitle="by vehicle"
+          slices={allocationSlices(data)}
+          centerValue={formatINRCompact(data.current_value)}
+          centerLabel="total"
+        />
       </div>
     </>
   );
+}
+
+function allocationSlices(data: DashboardData) {
+  const total = data.current_value || 1;
+  return [
+    { label: "Mutual funds", pct: Math.round((data.mf_value / total) * 100), color: "#005FB8", href: "/fund" },
+    { label: "Direct equity", pct: Math.round((data.equity_value / total) * 100), color: "#87bce8", href: "/stocks" },
+  ];
 }
 
 function formatUpdated(iso: string | null): string {
