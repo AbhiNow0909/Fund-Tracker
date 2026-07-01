@@ -12,7 +12,7 @@ import {
   MF_HOLDINGS,
   PORTFOLIO_SUMMARY as P,
 } from "@/lib/mockData";
-import { getDashboard, getValueSeries, refreshHoldings, type DashboardData, type ValuePoint } from "@/lib/api";
+import { getDashboard, getValueSeries, getPeriodGains, refreshHoldings, type DashboardData, type ValuePoint, type PeriodGainsData } from "@/lib/api";
 import { RealPortfolioValueChart } from "@/components/charts/RealPortfolioValueChart";
 import { SyncPricesPanel } from "@/components/ui/SyncPricesPanel";
 import { formatINR, formatINRCompact, formatPct, gainColorClass } from "@/lib/formatters";
@@ -27,16 +27,18 @@ export default function DashboardPage() {
 function MyDashboard({ onExplore }: { onExplore: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [valueSeries, setValueSeries] = useState<ValuePoint[]>([]);
+  const [periodGains, setPeriodGains] = useState<PeriodGainsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
 
   const load = () =>
-    Promise.all([getDashboard(), getValueSeries().catch(() => [])])
-      .then(([d, vs]) => {
+    Promise.all([getDashboard(), getValueSeries().catch(() => []), getPeriodGains().catch(() => null)])
+      .then(([d, vs, pg]) => {
         setData(d);
         setValueSeries(vs);
+        setPeriodGains(pg);
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load."))
       .finally(() => setLoading(false));
@@ -124,6 +126,9 @@ function MyDashboard({ onExplore }: { onExplore: () => void }) {
           gain={data.equity_gain}
           gainPct={data.equity_gain_pct}
         />
+        {periodGains && Object.keys(periodGains.gains).length > 0 && (
+          <PortfolioGainCard data={periodGains} />
+        )}
       </div>
 
       <div className="grid items-start gap-4 [grid-template-columns:2fr_1fr]">
@@ -166,6 +171,54 @@ function formatUpdated(iso: string | null): string {
       minute: "2-digit",
       hour12: true,
     })
+  );
+}
+
+const PERIOD_LABELS: Record<string, string> = {
+  "1D": "1 day",
+  "1W": "1 week",
+  "1M": "1 month",
+  "3M": "3 months",
+  "6M": "6 months",
+  "1Y": "1 year",
+  "3Y": "3 years",
+  "5Y": "5 years",
+  Max: "Total",
+};
+
+/** Portfolio gain (₹ + %) over a user-selected period. */
+function PortfolioGainCard({ data }: { data: PeriodGainsData }) {
+  const available = data.order.filter((p) => data.gains[p]);
+  const [period, setPeriod] = useState(available.includes("1D") ? "1D" : available[0]);
+  const g = data.gains[period];
+  const abs = g?.absolute ?? 0;
+
+  return (
+    <div className="rounded-card border border-black/[0.06] bg-card p-4 px-[18px] shadow-card">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[12.5px] text-ink-secondary">Portfolio gain</span>
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+          className="rounded-pill border border-black/[0.12] bg-[#fbfbfb] px-2 py-0.5 text-[11px] text-ink outline-none"
+          aria-label="Gain period"
+        >
+          {available.map((p) => (
+            <option key={p} value={p}>
+              {PERIOD_LABELS[p] ?? p}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className={`tnum mt-[3px] whitespace-nowrap text-[22px] font-semibold ${gainColorClass(abs)}`}>
+        {g ? `${abs >= 0 ? "+" : ""}${formatINR(abs)}` : "—"}
+      </div>
+      {g && g.pct != null && (
+        <div className={`tnum text-[12px] ${gainColorClass(g.pct)}`}>
+          {g.pct >= 0 ? "▲" : "▼"} {Math.abs(g.pct)}%
+        </div>
+      )}
+    </div>
   );
 }
 

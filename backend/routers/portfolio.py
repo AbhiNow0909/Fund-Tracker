@@ -355,6 +355,43 @@ def value_series(user_id: str = Depends(get_current_user_id)) -> dict:
     return {"series": points}
 
 
+_GAIN_PERIODS: list[tuple[str, int | None]] = [
+    ("1D", 1), ("1W", 7), ("1M", 30), ("3M", 91), ("6M", 182),
+    ("1Y", 365), ("3Y", 1095), ("5Y", 1825), ("Max", None),
+]
+
+
+@router.get("/period-gains")
+def period_gains(user_id: str = Depends(get_current_user_id)) -> dict:
+    """Portfolio gain (₹ + %) over standard periods, from the value series.
+
+    For each period, gain = current value − value as of (today − period). Uses the
+    full daily series (accurate for short windows). Empty until prices are synced.
+    """
+    import pandas as pd
+
+    from services import analytics_service as svc
+
+    series = svc.build_portfolio_value_series(get_supabase(), user_id)
+    if len(series) < 2:
+        return {"current_value": None, "order": [p for p, _ in _GAIN_PERIODS], "gains": {}}
+
+    last_date = series.index[-1]
+    current = float(series.iloc[-1])
+    gains: dict[str, dict] = {}
+    for label, days in _GAIN_PERIODS:
+        if days is None:
+            start = float(series.iloc[0])
+        else:
+            earlier = series.loc[: last_date - pd.Timedelta(days=days)]
+            start = float(earlier.iloc[-1]) if len(earlier) else float(series.iloc[0])
+        absolute = current - start
+        pct = (current / start - 1) * 100 if start else None
+        gains[label] = {"absolute": round(absolute, 2), "pct": round(pct, 2) if pct is not None else None}
+
+    return {"current_value": round(current, 2), "order": [p for p, _ in _GAIN_PERIODS], "gains": gains}
+
+
 class RefreshHoldingsResponse(BaseModel):
     refreshed_at: str
     mf_updated: int

@@ -225,6 +225,22 @@ export async function getValueSeries(): Promise<ValuePoint[]> {
   return d.series;
 }
 
+export interface PeriodGain {
+  absolute: number;
+  pct: number | null;
+}
+
+export interface PeriodGainsData {
+  current_value: number | null;
+  order: string[];
+  gains: Record<string, PeriodGain>;
+}
+
+/** Portfolio gain (₹ + %) over standard periods. */
+export function getPeriodGains(): Promise<PeriodGainsData> {
+  return getJson<PeriodGainsData>("/portfolio/period-gains");
+}
+
 export interface RefreshHoldingsResult {
   refreshed_at: string;
   mf_updated: number;
